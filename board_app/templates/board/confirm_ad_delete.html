@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Подтверждение удаления объявления{% endblock title %}
+
+{% block content %}
+<h2>Удаление объявления</h2>
+<p class='my-4'>Вы уверены что хотите удалить объявление "<strong>{{ advertisement.title }}</strong>"?</p>
+
+<form method='POST' action='{% url "ad_delete" advertisement.id %}'>
+    {% csrf_token %}
+        <button type='submit' class="btn btn-primary" style="background-color: #BB6830">Да, удалить</button>
+</form>
+
+    <a href='{% url "ad_detail" advertisement.id %}' class="btn btn-primary my-3" style="background-color: #93a89cff">Отмена</a>
+{% endblock content %}

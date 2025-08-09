@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Лотос{% endblock title %}
+
+{% block content %}
+    <h1>Oбъявления</h1>
+    {% if ads %}
+    <div class="container">
+        <div class="row">
+        {% for advertisement in ads %}
+        {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
+        {% endfor %}
+        </div>
+    </div>
+    {% else %}
+        <p>Объявлений нет</p>
+    {% endif %}
+{% endblock content %}

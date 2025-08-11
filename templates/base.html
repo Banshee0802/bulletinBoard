@@ -23,15 +23,24 @@
         <li class="nav-item">
           <a class="nav-link text-light" href="{% url 'ad_list' %}">Объявления</a>
         </li>
+        {% if request.user.is_authenticated %}
+         <li class="nav-item">
+          <a class="nav-link text-light" href="{% url 'profile' request.user.username %}">{{ request.user }}</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link text-light" href="{% url 'ad_create' %}">Создать объявление</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-light" href="#">Зарегистрироваться</a>
+          <a class="nav-link text-light" href="{% url 'logout' %}">Выйти из аккаунта</a>
+        </li>
+        {% else %}   
+        <li class="nav-item">
+          <a class="nav-link text-light" href="{% url 'register' %}">Зарегистрироваться</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-light" href="#">Войти</a>
+          <a class="nav-link text-light" href="{% url 'login' %}">Войти в аккаунт</a>
         </li>
+        {% endif %}
     </ul>
          </div>
   </div>

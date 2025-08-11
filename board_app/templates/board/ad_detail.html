@@ -11,8 +11,12 @@
 <p>{{ advertisement.description }}</p>
 <small>{{ advertisement.created_at }}</small>
 
+<p>Имя пользователя: <a href='{% url "profile" user_name=advertisement.user.username %}'>{{ ads.user }}</a></p>
+
+{% if request.user == advertisement.user %}
 <a href='{% url "ad_edit" advertisement.id %}' class="btn btn-primary" style="background-color: #93a89cff">Редактировать</a>
 <a href='{% url "ad_delete" advertisement.id %}' class="btn btn-primary" style="background-color: #BB6830">Удалить</a>
+{% endif %}
   </div>
         </div>
 {% endblock content %}

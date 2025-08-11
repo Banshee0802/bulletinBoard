@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Ваш профиль{% endblock title %}
+
+{% block content %}
+
+    {% if user == request.user %}
+        <h2>Ваш профиль</h2>
+    {% else %}
+        <h2>Профиль {{ user.username }}</h2>
+    {% endif %}
+
+    {% if ads %}
+        <h2>Объявления</h2>
+        {% for ad in ads %}
+        {% include 'board/includes/ads_container_include.html' %}
+        {% endfor %}
+    {% else %}
+        <p>Объявлений нет</p>
+    {% endif %}
+
+{% endblock content %}

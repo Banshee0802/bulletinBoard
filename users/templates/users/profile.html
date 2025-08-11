@@ -12,8 +12,8 @@
 
     {% if ads %}
         <h2>Объявления</h2>
-        {% for ad in ads %}
-        {% include 'board/includes/ads_container_include.html' %}
+        {% for advertisement in ads %}
+        {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
         {% endfor %}
     {% else %}
         <p>Объявлений нет</p>

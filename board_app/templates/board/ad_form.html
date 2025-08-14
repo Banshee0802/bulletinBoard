@@ -5,21 +5,28 @@
 {% block content %}
 <h2>{{ title }}</h2>
 
-<form method='POST'>
+<form method='POST' enctype='multipart/form-data'>
     {% csrf_token %}
     
     <div>
-        {{ form.title.label_tag }}
+        <label class="col-form-label mt-4" for="inputDefault">{{ form.title.label_tag }}</label>
         {{ form.title }}
         {{ form.title.errors }}
     </div>
 
     <div>
-        {{ form.description.label_tag }}
+        <label for="exampleTextarea" class="form-label mt-4">{{ form.description.label_tag }}</label>
         {{ form.description }}
         {{ form.description.errors }}
     </div>
-    <button type=submit class="btn btn-primary" style="background-color: #93a89cff">{{ submit_button_text }}</button>
+
+     <div>
+        <label for="formFile" class="form-label mt-4">{{ form.image.label_tag }}</label>
+        {{ form.image }}
+        {{ form.image.errors }}
+    </div>
+    
+    <button type=submit class="btn btn-primary my-3" style="background-color: #93a89cff">{{ submit_button_text }}</button>
 </form>
 
 {% endblock content %}

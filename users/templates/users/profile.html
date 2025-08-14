@@ -10,6 +10,33 @@
         <h2>Профиль {{ user.username }}</h2>
     {% endif %}
 
+    {% if user == request.user %}
+    <h3 class='my-4'>Отклики на ваши объявления</h3>
+    {% else %}
+     <h3 class='my-1'>Отклики на объявления пользователя {{ user.username }}</h3>
+    {% endif %}
+
+    {% if requests %}
+        <ul>
+        {% for req in requests %}
+            <li>
+                Заявка от {{ req.sender.username }} на объявление
+                <a href='{% url "ad_detail" id=req.advertisement.id %}'>{{ req.advertisement.title }}</a> - 
+                Статус: {{ req.get_status_display }}
+                {% if req.status == 'new' and user == request.user %}
+                    <form method='POST' action='{% url "request_update_status" req.id %}' style='display:inline;'>
+                        {% csrf_token %}
+                    <br><button name='status' value='accepted' type='submit' class="btn btn-primary my-3" style="background-color: #93a89cff">Принять</button>
+                        <button name='status' value='rejected' type='submit' class="btn btn-primary" style="background-color: #BB6830">Отклонить</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Откликов нет</p>
+    {% endif %}
+
     {% if ads %}
         <h2>Объявления</h2>
         {% for advertisement in ads %}

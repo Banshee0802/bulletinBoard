@@ -9,4 +9,5 @@ urlpatterns = [
     path('ad/<int:id>/edit/', views.ad_edit, name='ad_edit'),
     path('ad/<int:id>/delete/', views.ad_delete, name='ad_delete'),
     path('ad/create/', views.ad_create, name='ad_create'),
+    path('ad/<int:id>send_request/', views.send_request, name='send_request')
 ]

@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, get_user_model
 from .forms import RegisterForm, LoginForm
 from django.conf import settings
-from board_app.models import Advertisement
+from board_app.models import Advertisement, Request
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 
 User = get_user_model()
@@ -44,13 +46,28 @@ def logout_view(request):
 
 def profile_view(request, user_name):
     user = get_object_or_404(User, username=user_name)
-
     ads = Advertisement.objects.filter(user=user).order_by('-created_at')
+    requests = Request.objects.filter(receiver=user).order_by('-created_at')
 
     context = {
         'user': user,
-        'ads': ads
+        'ads': ads,
+        'requests': requests,
     }
 
     return render(request, 'users/profile.html', context)
 
+
+@login_required
+@require_POST
+def request_update_status(request, request_id):
+    req = get_object_or_404(Request, id=request_id)
+
+    if req.receiver != request.user:
+        return redirect('profile', user_name=request.user.username)
+    
+    new_status = request.POST.get('status')
+    if new_status in ['accepted', 'rejected']:
+        req.status = new_status
+        req.save()
+    return redirect('profile', user_name=request.user.username)

@@ -1,17 +1,19 @@
 <h2>Вход</h2>
-<form method="post">
+<form method="POST">
     {% csrf_token %}
     {{ form.non_field_errors }}
-    <p>
+    
+        <div class="mb-3">
         {{ form.username.label_tag }}<br>
         {{ form.username }}
         {{ form.username.errors }}
-    </p>
-    <p>
+     </div>
+ 
+         <div class="mb-3">
         {{ form.password.label_tag }}<br>
         {{ form.password }}
         {{ form.password.errors }}
-    </p>
+        </div>
     <button type="submit">Войти</button>
 </form>
 <a href="{% url 'register' %}">Нет аккаунта? Регистрация</a>

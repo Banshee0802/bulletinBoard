@@ -8,7 +8,7 @@
 
 <form method='POST' action='{% url "ad_delete" advertisement.id %}'>
     {% csrf_token %}
-        <button type='submit' class="btn btn-primary" style="background-color: #BB6830">Да, удалить</button>
+        <button type='submit' class="btn btn-primary" style="background-color: #BB6830"><i class="bi bi-trash mx-1"></i>Да, удалить</button>
 </form>
 
     <a href='{% url "ad_detail" advertisement.id %}' class="btn btn-primary my-3" style="background-color: #93a89cff">Отмена</a>

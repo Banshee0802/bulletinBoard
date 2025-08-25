@@ -6,7 +6,7 @@
 <h2>Удаление объявления</h2>
 <p class='my-4'>Вы уверены что хотите удалить объявление "<strong>{{ advertisement.title }}</strong>"?</p>
 
-<form method='POST' action='{% url "ad_delete" advertisement.id %}'>
+<form method='POST' action='{% url "ad_delete" advertisement.slug %}'>
     {% csrf_token %}
         <button type='submit' class="btn btn-primary" style="background-color: #BB6830"><i class="bi bi-trash mx-1"></i>Да, удалить</button>
 </form>

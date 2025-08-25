@@ -47,8 +47,8 @@ def ad_edit(request, id):
 
 
 @login_required
-def ad_delete(request, id):
-    advertisement = get_object_or_404(Advertisement, id=id)
+def ad_delete(request, slug):
+    advertisement = get_object_or_404(Advertisement, slug=slug)
 
     if request.method == 'POST':
         advertisement.delete()

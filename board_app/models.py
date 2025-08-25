@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from slugify import slugify
 
 User = get_user_model()
 
@@ -9,11 +10,28 @@ class Advertisement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='ads_images/', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads', null=True, blank=True)
+    slug = models.SlugField(max_length=200, blank=True, unique=True)
 
     class Meta:
         verbose_name = 'Объявление'
         verbose_name_plural = 'Объявления'
         db_table = 'board_ads'
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self.generate_unique_slug()
+        super().save(*args, **kwargs)
+
+    def generate_unique_slug(self):
+        slug = slugify(self.title)
+        unique_slug = slug
+        counter = 1
+
+        while Advertisement.objects.filter(slug=unique_slug).exclude(id=self.id).exists():
+            unique_slug = f'{slug}-{counter}'
+            counter += 1
+
+        return unique_slug
 
     def __str__(self):
         return self.title

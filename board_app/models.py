@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from slugify import slugify
+from unidecode import unidecode
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -11,6 +13,7 @@ class Advertisement(models.Model):
     image = models.ImageField(upload_to='ads_images/', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads', null=True, blank=True)
     slug = models.SlugField(max_length=200, blank=True, unique=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, related_name='ads')
 
     class Meta:
         verbose_name = 'Объявление'
@@ -52,5 +55,24 @@ class Request(models.Model):
 
     def __str__(self):
         return f'Заявка от {self.sender} к {self.receiver} на {self.advertisement.title} - {self.status}'
+    
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Категория')
+    slug = models.SlugField(unique=True, editable=False, verbose_name='Слаг')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unidecode(self.name))
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse('ads_by_category', kwargs={'category_slug': self.slug})
+    
+    class Meta:
+        verbose_name = 'Категория объявлений'
+        verbose_name_plural = 'Категории объявлений'
     
 

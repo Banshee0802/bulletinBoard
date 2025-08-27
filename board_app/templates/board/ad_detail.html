@@ -1,41 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}{{ advertisement.title}}{% endblock title %}
+{% block title %}{{ advertisement.title }}{% endblock title %}
 
 {% block content %}
 <a href='{% url "ad_list" %}' class="btn btn-primary" style="background-color: #93a89cff">&larr;Назад</a>
-            <div class="card text-dark h-100 my-3" style="background-color: #f0daafff">
-                <div class="card-body">
-                    {% if advertisement.image %}
-                        <img src="{{ advertisement.image.url }}" style="
-            max-width: 100%; 
-            max-height: 300px;
-            width: auto;
-            height: auto;
-            object-fit: contain;" class="img-fluid mb-3" alt="{{ advertisement.title }}">
-                    {% endif %}
-                <h2 class='card-title mb-3' style="color: #284139">
-                {{ advertisement.title }}</h2>
-<p>{{ advertisement.description }}</p>
-<small>{{ advertisement.created_at }}</small>
 
-<p>Имя пользователя: <a href='{% url "profile" user_name=advertisement.user.username %}'>{{ advertisement.user }}</a></p>
+<div class="card text-dark h-100 my-3" style="background-color: #f0daafff">
+    <div class="card-body">
+        {% if advertisement.image %}
+        <img src="{{ advertisement.image.url }}" style="max-width: 100%; max-height: 300px; width: auto; height: auto; object-fit: contain;" class="img-fluid mb-3" alt="{{ advertisement.title }}">
+        {% endif %}
+        
+        <h2 class="card-title mb-3" style="color: #284139">{{ advertisement.title }}</h2>
+        <p>{{ advertisement.description }}</p>
 
-{% if request.user == advertisement.user %}
-    <a href='{% url "ad_edit" advertisement.id %}' class="btn btn-primary" style="background-color: #93a89cff">Редактировать</a>
-    <a href='{% url "ad_delete" advertisement.slug %}' class="btn btn-primary" style="background-color: #BB6830"><i class="bi bi-trash mx-1"></i>Удалить</a>
-{% endif %}
+        {% if advertisement.category %}
+        <p>
+            <strong>Категория:</strong>
+            <a href="{{ advertisement.category.get_absolute_url }}">
+                {{ advertisement.category.name }}
+            </a>
+        </p>
+        {% else %}
+        <p><strong>Категория:</strong> не указана</p>
+        {% endif %}
 
-{% if request.user.is_authenticated and request.user != advertisement.user %}
-    {% if not has_requested %}
-    <form method='POST' action='{% url "send_request" id=advertisement.id %}'>
-        {% csrf_token %}
-        <button type='submit' class="btn btn-primary"><i class="bi bi-bell-fill mx-2"></i>Откликнуться</button>
-    </form>
-    {% else %}
-    <p><em>Вы уже откликнулись на это объявление</em></p>
-    {% endif %}
-{% endif %}
-  </div>
-        </div>
+        <small>{{ advertisement.created_at }}</small>
+
+        <p>
+            Имя пользователя:
+            <a href='{% url "profile" user_name=advertisement.user.username %}'>
+                {{ advertisement.user }}
+            </a>
+        </p>
+
+        {% if request.user == advertisement.user %}
+        <a href='{% url "ad_edit" advertisement.id %}' class="btn btn-primary" style="background-color: #93a89cff">Редактировать</a>
+        <a href='{% url "ad_delete" advertisement.slug %}' class="btn btn-primary" style="background-color: #bb6830">
+            <i class="bi bi-trash mx-1"></i>Удалить
+        </a>
+        {% endif %}
+
+        {% if request.user.is_authenticated and request.user != advertisement.user %}
+            {% if not has_requested %}
+            <form method="POST" action='{% url "send_request" id=advertisement.id %}'>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-bell-fill mx-2"></i>Откликнуться
+                </button>
+            </form>
+            {% else %}
+            <p><em>Вы уже откликнулись на это объявление</em></p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
 {% endblock content %}

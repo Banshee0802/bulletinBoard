@@ -1,0 +1,20 @@
+{% extends "base.html" %} 
+
+{% block title %}Категории объявлений{% endblock %} 
+
+{%block content %}
+<h1>Категории объявлений</h1>
+
+{% if categories %}
+<ul>
+  {% for category in categories %}
+  <li>
+    <a href="{% url 'ads_by_category' category.slug %}">
+      {{ category.name }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Категорий пока нет</p>
+{% endif %} {% endblock %}

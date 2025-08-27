@@ -25,6 +25,12 @@
         {{ form.image }}
         {{ form.image.errors }}
     </div>
+
+    <div class='mt-4'>
+        {{ form.categoty.label_tag }}
+        {{ form.category }}
+        {{ form.category.errors }}
+    </div>
     
     <button type=submit class="btn btn-primary my-3" style="background-color: #93a89cff">{{ submit_button_text }}</button>
 </form>

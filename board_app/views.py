@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Advertisement, Request
+from .models import Advertisement, Request, Category
 from .forms import AdvertisementForm
 from django.contrib.auth.decorators import login_required
 
@@ -100,3 +100,15 @@ def send_request(request, id):
     )
     return redirect('ad_detail', id=id)
     
+
+def ads_by_category(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    ads = Advertisement.objects.filter(category=category)
+    
+    return render(request, 'board/ad_list.html', {'category': category, 'ads': ads})
+
+
+def category_list(request):
+    categories = Category.objects.all()
+    
+    return render(request, 'board/category_list.html', {'categories': categories})

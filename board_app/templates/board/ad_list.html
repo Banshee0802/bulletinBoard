@@ -1,18 +1,52 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Лотос{% endblock title %}
 
 {% block content %}
-    <h1>Oбъявления</h1>
-    {% if ads %}
-    <div class="container">
-        <div class="row">
-        {% for advertisement in ads %}
-        {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
-        {% endfor %}
+<div class="container-fluid p-3"> 
+    <div class="row flex-nowrap">  
+        <div class="col-md-3 col-lg-3">
+            <div class="sticky-top vh-100" style="top: 0; left: 0;">
+                <div class="p-3">
+                    <h5 class="mb-3 my-4">Категории</h5>
+                    <ul class="list-group mb-0">
+                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+                            <a href="{% url 'ad_list' %}" class="text-decoration-none">
+                                <strong>📋 Все категории</strong>
+                            </a>
+                        </li>
+                        {% for category in all_categories %}
+                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+                            <a href="{{ category.get_absolute_url }}" 
+                               class="text-decoration-none d-flex justify-content-between align-items-center">
+                                <span>{{ category.name }}</span>
+                                <span class="badge bg-secondary">{{ category.advertisement_set.count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-9 col-lg-10">
+            <div class="p-3">  
+                <h1>Объявления</h1>
+                
+                {% if ads %}
+                    <div class="row">
+                        {% for advertisement in ads %}
+                            {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Объявлений нет</p>
+                {% endif %}
+            </div>
         </div>
     </div>
-    {% else %}
-        <p>Объявлений нет</p>
-    {% endif %}
+</div>
+
 {% endblock content %}

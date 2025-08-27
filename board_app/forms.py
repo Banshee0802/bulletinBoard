@@ -4,7 +4,7 @@ from .models import Advertisement
 class AdvertisementForm(forms.ModelForm):
     class Meta:
         model = Advertisement
-        fields = ['title', 'description', 'image']
+        fields = ['title', 'description', 'image', 'category']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -16,6 +16,9 @@ class AdvertisementForm(forms.ModelForm):
                 'id': "exampleTextarea",
                 'rows': 3
             }),
+            'category': forms.Select(attrs={
+                'class': 'form-select'
+            }),  
         }
         labels = {
             'title': 'Заголовок объявления',

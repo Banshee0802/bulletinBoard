@@ -1,5 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+}
+
+
+.slider-container {
+  width: 100%;
+  display: flex;
+  padding: 0 20px;
+  margin-top: 20px;
+}
+
+.slide{
+  height: 50vh;
+  border-radius: 20px;
+  margin: 10px;
+  cursor: pointer;  
+  color: #fff;
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  transition: all 500ms ease-in-out;
+}
+
+.slide h3{
+  position: absolute;
+  font-size: 24px;
+  color: #fff;
+  bottom: 20px;
+  left: 20px;
+  margin: 0;
+  opacity: 0;
+}
+
+.slide.active{
+  flex: 10;
+}
+
+.slide.active h3{
+  opacity: 1;
+  transition: 0.3s opacity 0.3s ease-in 0.4s;
+}
+
+.container .one {
+  background-image: url("/static/images/ryazan.jpg") !important;
+}
+.container .two {
+  background-image: url("/static/images/kaliningrad.jpg") !important;
+}
+.container .three {
+  background-image: url("/static/images/volgograd.jpg") !important;
+}
+.container .four {
+  background-image: url("/static/images/kazan.jpg") !important;
+}
+.container .five {
+  background-image: url("/static/images/tyumen.jpeg") !important;
 }

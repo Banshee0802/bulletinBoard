@@ -31,6 +31,25 @@
         {{ form.category }}
         {{ form.category.errors }}
     </div>
+
+    <div class='mt-4'>
+        <label class="form-label">{{ form.new_tags.label_tag }}</label>
+        {{ form.new_tags }}
+        <small class="form-text text-muted">Введите теги через запятую (например: срочно, электроника, услуги)</small>
+        {{ form.new_tags.errors }}
+
+        {% if current_tags %}
+        <div class="mt-2">
+            <strong>Текущие теги:</strong>
+            <div class="d-flex flex-wrap gap-1 mt-1">
+                {% for tag in current_tags %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            <small class="text-muted">Чтобы изменить теги, введите новые через запятую</small>
+        </div>
+        {% endif %}
+    </div>
     
     <button type=submit class="btn btn-primary my-3" style="background-color: #93a89cff">{{ submit_button_text }}</button>
 </form>

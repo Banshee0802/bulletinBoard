@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Все теги{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Все теги</h2>
+    
+    {% if user.is_authenticated %}
+    <a href="{% url 'add_tag' %}" class="btn btn-primary mb-3" style="background-color: #93a89cff">
+        + Добавить тег
+    </a>
+    {% endif %}
+    
+    <div class="row">
+        {% for tag in tags %}
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ tag.get_absolute_url }}" class="text-decoration-none">
+                            {{ tag.name }}
+                        </a>
+                    </h5>
+                    <p class="card-text">
+                        <small class="text-muted">Объявлений: {{ tag.ads.count }}</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Тегов пока нет. {% if user.is_authenticated %}<a href="{% url 'add_tag' %}">Создайте первый тег</a>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

@@ -6,6 +6,32 @@ from django.urls import reverse
 
 User = get_user_model()
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Тег', unique=True)
+    slug = models.SlugField(unique=True, editable=False, verbose_name='Слаг')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unidecode(self.name))
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse('ads_by_tag', kwargs={'tag_slug': self.slug})
+    
+    @property
+    def ads_count(self):
+        return self.ads.count()
+    
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
 class Advertisement(models.Model):
     title = models.CharField(max_length=200, verbose_name='Заголовок')
     description = models.TextField(verbose_name='Описание')
@@ -14,6 +40,7 @@ class Advertisement(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads', null=True, blank=True)
     slug = models.SlugField(max_length=200, blank=True, unique=True)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, related_name='ads')
+    tags = models.ManyToManyField(Tag, blank=True, related_name='ads', verbose_name='Теги')
 
     class Meta:
         verbose_name = 'Объявление'

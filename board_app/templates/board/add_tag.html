@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label class="form-label">{{ form.name.label_tag }}</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+            <small class="form-text text-muted">Введите уникальное название тега</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="background-color: #93a89cff">
+            Создать тег
+        </button>
+        <a href="{% url 'tag_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock content %}

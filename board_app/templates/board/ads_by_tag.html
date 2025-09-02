@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Объявления с тегом "{{ tag.name }}"</h2>
+    
+    <a href="{% url 'ad_list' %}" class="btn btn-primary mb-3" style="background-color: #93a89cff">
+        &larr; Все объявления
+    </a>
+    
+    {% if ads %}
+        <div class="row">
+            {% for advertisement in ads %}
+                {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Нет объявлений с тегом "{{ tag.name }}"
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

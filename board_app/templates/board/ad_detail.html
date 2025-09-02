@@ -25,6 +25,19 @@
         <p><strong>Категория:</strong> не указана</p>
         {% endif %}
 
+        {% if advertisement.tags.all %}
+            <p>
+                <strong>Теги:</strong>
+                    {% for tag in advertisement.tags.all %}
+                        <a href="{{ tag.get_absolute_url }}" class="badge bg-secondary me-1 text-decoration-none">
+                        {{ tag.name }}
+                        </a>
+                    {% endfor %}
+            </p>
+        {% else %}
+            <p><strong>Теги:</strong> не указаны</p>
+        {% endif %}
+
         <small>{{ advertisement.created_at }}</small>
 
         <p>

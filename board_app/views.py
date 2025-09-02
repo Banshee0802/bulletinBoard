@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Advertisement, Request, Category
-from .forms import AdvertisementForm
+from .models import Advertisement, Request, Category, Tag
+from .forms import AdvertisementForm, TagForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def main_page(request):
     return render(request, 'board/main_page.html')
@@ -37,13 +38,18 @@ def ad_edit(request, id):
         if form.is_valid():
             edit_ad = form.save()
 
+            form.save_m2m()
+
             return redirect('ad_detail', id=edit_ad.id)
         else:
-            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text})
+            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': advertisement.tags.all()})
+        
+    current_tags = ', '.join([tag.name for tag in advertisement.tags.all()])
+    initial_data = {'new_tags': current_tags}
         
     form = AdvertisementForm(instance=advertisement)
 
-    return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text})
+    return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': advertisement.tags.all()})
 
 
 @login_required
@@ -76,9 +82,11 @@ def ad_create(request):
 
             advertisement.save()
 
+            form.save_m2m()
+
             return redirect('ad_detail', id=advertisement.id)
         else:
-            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text})
+            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': None})
         
 
 @login_required
@@ -112,3 +120,38 @@ def category_list(request):
     categories = Category.objects.all()
     
     return render(request, 'board/category_list.html', {'categories': categories})
+
+
+def ads_by_tag(request, tag_slug):
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    ads = Advertisement.objects.filter(tags=tag).order_by('-created_at')
+    
+    return render(request, 'board/ads_by_tag.html', {
+        'tag': tag,
+        'ads': ads,
+        'title': f'Объявления с тегом "{tag.name}"'
+    })
+
+
+@login_required
+def add_tag(request):
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Тег успешно создан!')
+            return redirect('tag_list')
+        else:
+            messages.error(request, 'Ошибка при создании тега')
+    else:
+        form = TagForm()
+    
+    return render(request, 'board/add_tag.html', {
+        'form': form,
+        'title': 'Создать новый тег'
+    })
+
+
+def tag_list(request):
+    tags = Tag.objects.all().order_by('name')
+    return render(request, 'board/tag_list.html', {'tags': tags})

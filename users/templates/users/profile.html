@@ -21,7 +21,7 @@
         {% for req in requests %}
             <li>
                 Заявка от {{ req.sender.username }} на объявление
-                <a href='{% url "ad_detail" id=req.advertisement.id %}'>{{ req.advertisement.title }}</a> - 
+                <a href='{% url "ad_detail" req.advertisement.id %}'>{{ req.advertisement.title }}</a> - 
                 Статус: {{ req.get_status_display }}
                 {% if req.status == 'new' and user == request.user %}
                     <form method='POST' action='{% url "request_update_status" req.id %}' style='display:inline;'>

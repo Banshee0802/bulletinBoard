@@ -17,14 +17,17 @@
       {% endif %}
       <h3 class="card-title mb-3 my-3">
         <a
-          href="{% url 'ad_detail' id=advertisement.id %}"
+          href="{% url 'ad_detail' advertisement.id %}"
           style="color: #284139"
           >{{ advertisement.title }}</a
         >
       </h3>
       <div class="mt-auto pt-2">
         <small class="text-muted"
-          >Дата публикации: {{ advertisement.created_at|date:'d.m.y' }}</small
+          >Создано: {{ advertisement.created_at|date:'d.m.y' }}</small
+        ><br>
+        <small class="text-muted"
+          >Последнее обновление: {{ advertisement.updated_at|date:'d.m.y' }}</small
         >
       </div>
     </div>

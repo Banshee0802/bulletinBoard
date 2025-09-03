@@ -5,6 +5,14 @@
 {% block content %}
 <h2>{{ title }}</h2>
 
+{% if form.instance.created_at %}
+    <p><strong>Создано:</strong> {{ form.instance.created_at|date:'d.m.Y H:i' }}</p>
+{% endif %}
+
+{% if form.instance.updated_at and form.instance.created_at != form.instance.updated_at %}
+    <p><strong>Последнее обновление:</strong> {{ form.instance.updated_at|date:'d.m.Y H:i' }}</p>
+{% endif %}
+
 <form method='POST' enctype='multipart/form-data'>
     {% csrf_token %}
     

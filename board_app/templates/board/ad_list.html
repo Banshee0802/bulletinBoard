@@ -18,7 +18,7 @@
                         </li>
                         {% for category in all_categories %}
                         <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
-                            <a href="{{ category.get_absolute_url }}" 
+                            <a href="{% url 'ads_by_category' category.slug %}" 
                                class="text-decoration-none d-flex justify-content-between align-items-center">
                                 <span>{{ category.name }}</span>
                                 <span class="badge bg-secondary">{{ category.advertisement_set.count }}</span>
@@ -29,8 +29,6 @@
                 </div>
             </div>
         </div>
-
-
 
         <div class="col-md-9 col-lg-10">
             <div class="p-3">  

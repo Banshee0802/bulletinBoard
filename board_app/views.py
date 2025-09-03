@@ -1,157 +1,174 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.contrib import messages
 from .models import Advertisement, Request, Category, Tag
 from .forms import AdvertisementForm, TagForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 
-def main_page(request):
-    return render(request, 'board/main_page.html')
+class MainPageView(TemplateView):
+    template_name = 'board/main_page.html'
 
+class AdListView(ListView):
+    model = Advertisement
+    template_name = 'board/ad_list.html'
+    context_object_name = 'ads'
+    ordering = ['-created_at']
 
-def ad_list(request):
-    ads = Advertisement.objects.all().order_by('-created_at')
-    return render(request, 'board/ad_list.html', context={'ads': ads})
+class AdDetailView(DetailView):
+    model = Advertisement
+    template_name = 'board/ad_detail.html'
+    context_object_name = 'advertisement'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        advertisement = self.get_object()
+        
+        has_requested = False
+        if self.request.user.is_authenticated:
+            has_requested = Request.objects.filter(
+                advertisement=advertisement,
+                sender=self.request.user
+            ).exists()
+        
+        context['has_requested'] = has_requested
+        return context
 
+class AdCreateView(LoginRequiredMixin, CreateView):
+    model = Advertisement
+    form_class = AdvertisementForm
+    template_name = 'board/ad_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Создать объявление'
+        context['submit_button_text'] = 'Опубликовать'
+        context['current_tags'] = None
+        return context
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        response = super().form_valid(form)
+        form.save_m2m()
+        return response
+    
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+    
+    def get_success_url(self):
+        return reverse_lazy('ad_detail', kwargs={'pk': self.object.id})
 
-def ad_detail(request, id):
-    advertisement = get_object_or_404(Advertisement, id=id)
+class AdUpdateView(LoginRequiredMixin, UpdateView):
+    model = Advertisement
+    form_class = AdvertisementForm
+    template_name = 'board/ad_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Редактировать объявление'
+        context['submit_button_text'] = 'Обновить'
+        context['current_tags'] = self.object.tags.all()
+        return context
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        form.save_m2m()
+        return response
+    
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+    
+    def get_success_url(self):
+        return reverse_lazy('ad_detail', kwargs={'pk': self.object.id})
 
-    has_requested = False
-    if request.user.is_authenticated:
-        has_requested = Request.objects.filter(
+class AdDeleteView(LoginRequiredMixin, DeleteView):
+    model = Advertisement
+    template_name = 'board/confirm_ad_delete.html'
+    success_url = reverse_lazy('ad_list')
+    
+    def get_object(self, queryset=None):
+        return get_object_or_404(Advertisement, slug=self.kwargs['slug'])
+
+class SendRequestView(LoginRequiredMixin, DetailView):
+    model = Advertisement
+    http_method_names = ['post']  # Разрешаем только POST запросы
+    
+    def post(self, request, *args, **kwargs):
+        advertisement = self.get_object()
+        
+        if advertisement.user == request.user:
+            return redirect('ad_detail', pk=advertisement.id)
+        
+        existing_request = Request.objects.filter(
+            sender=request.user, 
+            advertisement=advertisement
+        ).first()
+        
+        if existing_request:
+            return redirect('ad_detail', pk=advertisement.id)
+        
+        Request.objects.create(
+            sender=request.user,
+            receiver=advertisement.user,
             advertisement=advertisement,
-            sender=request.user
-        ).exists()
-
-    return render(request, 'board/ad_detail.html', context={'advertisement': advertisement, 'has_requested': has_requested})
-
-
-@login_required
-def ad_edit(request, id):
-    title = "Редактировать объявление"
-    submit_button_text = 'Обновить'
-    advertisement = get_object_or_404(Advertisement, id=id)
-
-    if request.method == 'POST':
-        form = AdvertisementForm(request.POST, request.FILES, instance=advertisement)
-
-        if form.is_valid():
-            edit_ad = form.save()
-
-            form.save_m2m()
-
-            return redirect('ad_detail', id=edit_ad.id)
-        else:
-            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': advertisement.tags.all()})
+            status='new',
+        )
         
-    current_tags = ', '.join([tag.name for tag in advertisement.tags.all()])
-    initial_data = {'new_tags': current_tags}
-        
-    form = AdvertisementForm(instance=advertisement)
+        return redirect('ad_detail', pk=advertisement.id)
 
-    return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': advertisement.tags.all()})
-
-
-@login_required
-def ad_delete(request, slug):
-    advertisement = get_object_or_404(Advertisement, slug=slug)
-
-    if request.method == 'POST':
-        advertisement.delete()
-
-        return redirect('ad_list')
-    return render(request, 'board/confirm_ad_delete.html', {'advertisement': advertisement})
-
-@login_required
-def ad_create(request):
-    title = 'Создать объявление'
-    submit_button_text = 'Опубликовать'
-
-    if request.method == 'GET':
-        form = AdvertisementForm()
-
-        return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text})
+class AdsByCategoryView(ListView):
+    template_name = 'board/ad_list.html'
+    context_object_name = 'ads'
     
-    if request.method == 'POST':
-        form = AdvertisementForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            advertisement = form.save(commit=False)
-
-            advertisement.user = request.user
-
-            advertisement.save()
-
-            form.save_m2m()
-
-            return redirect('ad_detail', id=advertisement.id)
-        else:
-            return render(request, 'board/ad_form.html', context={'form': form, 'title': title, 'submit_button_text': submit_button_text, 'current_tags': None})
-        
-
-@login_required
-def send_request(request, id):
-    advertisement = get_object_or_404(Advertisement, id=id)
-
-    if advertisement.user == request.user:
-        return redirect('ad_detail', id=id)
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        return Advertisement.objects.filter(category=self.category)
     
-    existing_request = Request.objects.filter(sender=request.user, advertisement=advertisement).first()
-    if existing_request:
-        return redirect('ad_detail', id=id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'board/category_list.html'
+    context_object_name = 'categories'
+
+class AdsByTagView(ListView):
+    template_name = 'board/ads_by_tag.html'
+    context_object_name = 'ads'
     
-    new_request = Request.objects.create(
-        sender=request.user,
-        receiver=advertisement.user,
-        advertisement=advertisement,
-        status='new',
-    )
-    return redirect('ad_detail', id=id)
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Advertisement.objects.filter(tags=self.tag).order_by('-created_at')
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        context['title'] = f'Объявления с тегом "{self.tag.name}"'
+        return context
 
-def ads_by_category(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
-    ads = Advertisement.objects.filter(category=category)
+class AddTagView(LoginRequiredMixin, CreateView):
+    model = Tag
+    form_class = TagForm
+    template_name = 'board/add_tag.html'
+    success_url = reverse_lazy('tag_list')
     
-    return render(request, 'board/ad_list.html', {'category': category, 'ads': ads})
-
-
-def category_list(request):
-    categories = Category.objects.all()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Создать новый тег'
+        return context
     
-    return render(request, 'board/category_list.html', {'categories': categories})
-
-
-def ads_by_tag(request, tag_slug):
-    tag = get_object_or_404(Tag, slug=tag_slug)
-    ads = Advertisement.objects.filter(tags=tag).order_by('-created_at')
+    def form_valid(self, form):
+        messages.success(self.request, 'Тег успешно создан!')
+        return super().form_valid(form)
     
-    return render(request, 'board/ads_by_tag.html', {
-        'tag': tag,
-        'ads': ads,
-        'title': f'Объявления с тегом "{tag.name}"'
-    })
+    def form_invalid(self, form):
+        messages.error(self.request, 'Ошибка при создании тега')
+        return super().form_invalid(form)
 
-
-@login_required
-def add_tag(request):
-    if request.method == 'POST':
-        form = TagForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Тег успешно создан!')
-            return redirect('tag_list')
-        else:
-            messages.error(request, 'Ошибка при создании тега')
-    else:
-        form = TagForm()
-    
-    return render(request, 'board/add_tag.html', {
-        'form': form,
-        'title': 'Создать новый тег'
-    })
-
-
-def tag_list(request):
-    tags = Tag.objects.all().order_by('name')
-    return render(request, 'board/tag_list.html', {'tags': tags})
+class TagListView(ListView):
+    model = Tag
+    template_name = 'board/tag_list.html'
+    context_object_name = 'tags'
+    ordering = ['name']

@@ -1,23 +1,25 @@
 {% extends "base.html" %}
+{% load tz %}
+
 
 {% block title %}{{ advertisement.title }}{% endblock title %}
 
 {% block content %}
-<a href='{% url "ad_list" %}' class="btn btn-primary" style="background-color: #93a89cff">&larr;Назад</a>
+<a href='{% url "ad_list" %}' class="btn btn-custom">&larr;Назад</a>
 
-<div class="card text-dark h-100 my-3" style="background-color: #f0daafff">
+<div class="card text-dark h-100 my-3" style="background-color: #ffdfe7ff">
     <div class="card-body">
         {% if advertisement.image %}
         <img src="{{ advertisement.image.url }}" style="max-width: 100%; max-height: 300px; width: auto; height: auto; object-fit: contain;" class="img-fluid mb-3" alt="{{ advertisement.title }}">
         {% endif %}
         
-        <h2 class="card-title mb-3" style="color: #284139">{{ advertisement.title }}</h2>
+        <h2 class="card-title mb-3" style="color: #000000ff">{{ advertisement.title }}</h2>
         <p>{{ advertisement.description }}</p>
 
         {% if advertisement.category %}
         <p>
             <strong>Категория:</strong>
-            <a href="{{ advertisement.category.get_absolute_url }}">
+            <a href="{{ advertisement.category.get_absolute_url }}" style='color: #8484f8ff'>
                 {{ advertisement.category.name }}
             </a>
         </p>
@@ -29,7 +31,7 @@
             <p>
                 <strong>Теги:</strong>
                     {% for tag in advertisement.tags.all %}
-                        <a href="{{ tag.get_absolute_url }}" class="badge bg-secondary me-1 text-decoration-none">
+                        <a href="{{ tag.get_absolute_url }}" class="badge bg-secondary me-1 text-decoration-none" style='color: #fdfdfdff'>
                         {{ tag.name }}
                         </a>
                     {% endfor %}
@@ -38,19 +40,18 @@
             <p><strong>Теги:</strong> не указаны</p>
         {% endif %}
 
-        <small><strong>Создано: </strong>{{ advertisement.created_at }}</small><br>
-        <small><strong>Последнее обновление: </strong> {{ advertisement.updated_at|date:'d.m.Y H:i' }}</small>
+        <small><strong>Создано: </strong>{{ advertisement.created_at|localtime|date:'Y-m-d H:i:s' }}</small><br>
+        <small><strong>Последнее обновление: </strong> {{ advertisement.updated_at|localtime|date:'Y-m-d H:i:s' }}</small>
 
-        <p>
-            Имя пользователя:
-            <a href='{% url "profile" user_name=advertisement.user.username %}'>
+        <p>Имя пользователя:
+            <a href='{% url "profile" user_name=advertisement.user.username %}' style='color: #8484f8ff'>
                 {{ advertisement.user }}
             </a>
         </p>
 
         {% if request.user == advertisement.user %}
-        <a href='{% url "ad_edit" advertisement.id %}' class="btn btn-primary" style="background-color: #93a89cff">Редактировать</a>
-        <a href='{% url "ad_delete" advertisement.slug %}' class="btn btn-primary" style="background-color: #bb6830">
+        <a href='{% url "ad_edit" advertisement.id %}' class="btn btn-custom">Редактировать</a>
+        <a href='{% url "ad_delete" advertisement.slug %}' class="btn btn-delete">
             <i class="bi bi-trash mx-1"></i>Удалить
         </a>
         {% endif %}
@@ -59,7 +60,7 @@
             {% if not has_requested %}
             <form method="POST" action='{% url "send_request" advertisement.id %}'>
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-custom">
                     <i class="bi bi-bell-fill mx-2"></i>Откликнуться
                 </button>
             </form>

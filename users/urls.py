@@ -1,10 +1,10 @@
 from django.urls import path
-from . import views
+from .views import RegisterView, CustomLoginView, CustomLogoutView, ProfileView, RequestUpdateStatusView
 
 urlpatterns = [
-    path('register/', views.register_view, name='register'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    path('<str:user_name>/', views.profile_view, name='profile'),
-    path('request/<int:request_id>/update_status/', views.request_update_status, name='request_update_status')
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('profile/<str:user_name>/', ProfileView.as_view(), name='profile'),
+    path('request/<int:request_id>/update_status/', RequestUpdateStatusView.as_view(), name='request_update_status')
 ]

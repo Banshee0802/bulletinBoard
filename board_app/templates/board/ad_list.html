@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load tz %}
 
 {% block title %}Лотос{% endblock title %}
 
@@ -8,31 +9,29 @@
     <div class="row flex-nowrap">  
         <div class="col-md-3 col-lg-3"> 
             <div class="sticky-top vh-100" style="top: 0; left: 0;">
-                <div class="p-3">
-                    <h5 class="mb-3 my-4">Категории</h5>
+                    <h5 class="mb-3 my-4" style="color: #000000ff">Категории</h5>
                     <ul class="list-group mb-0">
-                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
                             <a href="{% url 'ad_list' %}" class="text-decoration-none">
-                                <strong>📋 Все категории</strong>
+                                <strong style='color: #8484f8ff'>📋 Все категории</strong>
                             </a>
                         </li>
                         {% for category in all_categories %}
-                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
                             <a href="{% url 'ads_by_category' category.slug %}" 
                                class="text-decoration-none d-flex justify-content-between align-items-center">
-                                <span>{{ category.name }}</span>
+                                <span style='color: #8484f8ff'>{{ category.name }}</span>
                                 <span class="badge bg-secondary">{{ category.advertisement_set.count }}</span>
                             </a>
                         </li>
                         {% endfor %}
                     </ul>
                 </div>
-            </div>
         </div>
 
         <div class="col-md-9 col-lg-10">
             <div class="p-3">  
-                <h1>Объявления</h1>
+                <h1 style="color: #000000ff">Объявления</h1>
                 
                 {% if ads %}
                     <div class="row">

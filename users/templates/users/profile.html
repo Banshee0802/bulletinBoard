@@ -11,9 +11,9 @@
     {% endif %}
 
     {% if user == request.user %}
-    <h3 class='my-4'>Отклики на ваши объявления</h3>
+        <h3 class='my-4'>Отклики на ваши объявления</h3>
     {% else %}
-     <h3 class='my-1'>Отклики на объявления пользователя {{ user.username }}</h3>
+        <h3 class='my-1'>Отклики на объявления пользователя {{ user.username }}</h3>
     {% endif %}
 
     {% if requests %}
@@ -26,8 +26,8 @@
                 {% if req.status == 'new' and user == request.user %}
                     <form method='POST' action='{% url "request_update_status" req.id %}' style='display:inline;'>
                         {% csrf_token %}
-                    <br><button name='status' value='accepted' type='submit' class="btn btn-primary my-3" style="background-color: #93a89cff">Принять</button>
-                        <button name='status' value='rejected' type='submit' class="btn btn-primary" style="background-color: #BB6830">Отклонить</button>
+                    <br><button name='status' value='accepted' type='submit' class="btn btn-custom my-3">Принять</button>
+                        <button name='status' value='rejected' type='submit' class="btn btn-delete">Отклонить</button>
                     </form>
                 {% endif %}
             </li>

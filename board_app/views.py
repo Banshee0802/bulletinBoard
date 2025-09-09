@@ -91,7 +91,7 @@ class AdDeleteView(LoginRequiredMixin, DeleteView):
 
 class SendRequestView(LoginRequiredMixin, DetailView):
     model = Advertisement
-    http_method_names = ['post']  # Разрешаем только POST запросы
+    http_method_names = ['post'] 
     
     def post(self, request, *args, **kwargs):
         advertisement = self.get_object()
@@ -172,3 +172,6 @@ class TagListView(ListView):
     template_name = 'board/tag_list.html'
     context_object_name = 'tags'
     ordering = ['name']
+
+
+    

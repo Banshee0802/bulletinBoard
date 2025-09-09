@@ -62,3 +62,73 @@
 .container .five {
   background-image: url("/static/images/tyumen.jpeg") !important;
 }
+
+.btn-custom {
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    background-image: linear-gradient(to right,#c5c5fd 0%, #FFD1DC 51%, #c5c5fd 100%);
+}
+
+.btn-custom:hover {
+    background-position: right center;
+}
+
+.btn-delete {
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    background-image: linear-gradient(to right, #FFD1DC 0%, #c5c5fd 51%, #FFD1DC 100%);
+}
+
+.btn-delete:hover {
+    background-position: right center; 
+}
+
+
+.navbar-nav .nav-link {
+    color: #6161f7ff;
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 7px;
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #6161f7ff; 
+    transform: translateY(-2px); 
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #6161f7ff;
+    transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 100%;
+}
+
+.sticky-top {
+  margin-top: 16%;
+}
+
+.list-group-item:hover {
+    color: #6161f7ff; 
+    transform: translateX(2px);
+}
+
+h2, h3 {
+  color: black;
+}

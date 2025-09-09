@@ -8,8 +8,8 @@
 {% if categories %}
 <ul>
   {% for category in categories %}
-  <li>
-    <a href="{% url 'ads_by_category' category.slug %}">
+  <li style='color: #8484f8ff'>
+    <a href="{% url 'ads_by_category' category.slug %}" style='color: #8484f8ff'>
       {{ category.name }}
     </a>
   </li>

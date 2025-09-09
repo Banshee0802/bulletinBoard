@@ -14,8 +14,7 @@
   {% csrf_token %}
   <button
     type="submit"
-    class="btn btn-primary"
-    style="background-color: #bb6830"
+    class="btn btn-delete"
   >
     <i class="bi bi-trash mx-1"></i>Да, удалить
   </button>
@@ -23,8 +22,7 @@
 
 <a
   href='{% url "ad_detail" advertisement.id %}'
-  class="btn btn-primary my-3"
-  style="background-color: #93a89cff"
+  class="btn btn-custom my-3"
   >Отмена</a
 >
 {% endblock content %}

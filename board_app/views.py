@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Advertisement, Request, Category, Tag
 from .forms import AdvertisementForm, TagForm
+from django.core.paginator import Paginator
+from django.db.models import F
 
 class MainPageView(TemplateView):
     template_name = 'board/main_page.html'
@@ -14,11 +16,24 @@ class AdListView(ListView):
     template_name = 'board/ad_list.html'
     context_object_name = 'ads'
     ordering = ['-created_at']
+    paginate_by = 9
+
 
 class AdDetailView(DetailView):
     model = Advertisement
     template_name = 'board/ad_detail.html'
     context_object_name = 'advertisement'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if request.user != self.object.user:
+            Advertisement.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+
+            self.object.refresh_from_db()
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

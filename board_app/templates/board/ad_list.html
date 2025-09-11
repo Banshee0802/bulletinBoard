@@ -9,24 +9,24 @@
     <div class="row flex-nowrap">  
         <div class="col-md-3 col-lg-3"> 
             <div class="sticky-top vh-100" style="top: 0; left: 0;">
-                    <h5 class="mb-3 my-4" style="color: #000000ff">Категории</h5>
-                    <ul class="list-group mb-0">
-                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
-                            <a href="{% url 'ad_list' %}" class="text-decoration-none">
-                                <strong style='color: #8484f8ff'>📋 Все категории</strong>
-                            </a>
-                        </li>
-                        {% for category in all_categories %}
-                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
-                            <a href="{% url 'ads_by_category' category.slug %}" 
-                               class="text-decoration-none d-flex justify-content-between align-items-center">
-                                <span style='color: #8484f8ff'>{{ category.name }}</span>
-                                <span class="badge bg-secondary">{{ category.advertisement_set.count }}</span>
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                <h5 class="mb-3 my-4" style="color: #000000ff">Категории</h5>
+                <ul class="list-group mb-0">
+                    <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
+                        <a href="{% url 'ad_list' %}" class="text-decoration-none">
+                            <strong style='color: #8484f8ff'>📋 Все категории</strong>
+                        </a>
+                    </li>
+                    {% for category in all_categories %}
+                    <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center" style='background-color: #E6E6FA'>
+                        <a href="{% url 'ads_by_category' category.slug %}" 
+                           class="text-decoration-none d-flex justify-content-between align-items-center">
+                            <span style='color: #8484f8ff'>{{ category.name }}</span>
+                            <span class="badge bg-secondary">{{ category.advertisement_set.count }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
 
         <div class="col-md-9 col-lg-10">
@@ -39,12 +39,100 @@
                             {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
                         {% endfor %}
                     </div>
+
+                    {% if is_paginated %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                        &laquo;&laquo;
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" style="background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+                                        &laquo;&laquo;
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                        &laquo;
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" style="background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+                                        &laquo;
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link" style="background-color: #8484f8ff; border-color: #8484f8ff;">
+                                            {{ num }}
+                                        </span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                            {{ num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                        &raquo;
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" style="background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+                                        &raquo;
+                                    </span>
+                                </li>
+                            {% endif %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                        &raquo;&raquo;
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" style="background-color: #f8f9fa; color: #6c757d; border-color: #dee2e6;">
+                                        &raquo;&raquo;
+                                    </span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">
+                                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} 
+                                • Показано {{ ads|length }} из {{ page_obj.paginator.count }} объявлений
+                            </small>
+                        </div>
+                    </nav>
+                    {% endif %}
+
                 {% else %}
-                    <p>Объявлений нет</p>
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: #8484f8ff;"></i>
+                        <p class="mt-3" style="color: #6c757d;">Объявлений нет</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}

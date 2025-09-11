@@ -121,7 +121,7 @@
 }
 
 .sticky-top {
-  margin-top: 16%;
+    margin-top: 16%;
 }
 
 .list-group-item:hover {
@@ -130,5 +130,25 @@
 }
 
 h2, h3 {
-  color: black;
+    color: black;
 }
+
+.page-link:hover {
+    background-color: #8484f8ff !important;
+    color: white !important;
+    border-color: #8484f8ff !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+    }
+    
+.page-item.active .page-link {
+    background-color: #8484f8ff !important;
+    border-color: #8484f8ff !important;
+    }
+    
+.pagination {
+    box-shadow: 0 2px 8px rgba(132, 132, 248, 0.15);
+    border-radius: 8px;
+    padding: 5px;
+    background-color: white;
+    }

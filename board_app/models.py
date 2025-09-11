@@ -42,6 +42,7 @@ class Advertisement(models.Model):
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, related_name='ads')
     tags = models.ManyToManyField(Tag, blank=True, related_name='ads', verbose_name='Теги')
     updated_at = models.DateTimeField(auto_now=True)
+    views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
 
     class Meta:
         verbose_name = 'Объявление'

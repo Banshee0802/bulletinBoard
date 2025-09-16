@@ -14,4 +14,5 @@ urlpatterns = [
     path('tags/add/', views.AddTagView.as_view(), name='add_tag'),
     path('ads/category/<slug:category_slug>/', views.AdsByCategoryView.as_view(), name='ads_by_category'),
     path('ads/categories/', views.CategoryListView.as_view(), name='ad_categories'),
+    path('ads/admin-ads/', views.AdminAdsView.as_view(), name='admin_ads'),
 ]

@@ -18,7 +18,6 @@ class AdListView(ListView):
     ordering = ['-created_at']
     paginate_by = 9
 
-
 class AdDetailView(DetailView):
     model = Advertisement
     template_name = 'board/ad_detail.html'
@@ -189,4 +188,12 @@ class TagListView(ListView):
     ordering = ['name']
 
 
+class AdminAdsView(ListView):
+    model = Advertisement
+    template_name = 'board/admin_ads.html'
+    context_object_name = 'ads'
+
+    def get_queryset(self):
+        return Advertisement.objects.filter(user__is_superuser=True).order_by('-created_at')
     
+        

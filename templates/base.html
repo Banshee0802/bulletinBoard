@@ -41,7 +41,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'profile' request.user.username %}"> <i class="bi bi-person-circle me-1 mx-2"></i>{{ request.user }}</a>
                     </li>
-                    <li class="nav-item">  <!-- ДОБАВЬТЕ этот li -->
+                    <li class="nav-item"> 
                         <form action="{% url 'logout' %}" method="post" class="h-100 d-flex align-items-center">
                             {% csrf_token %}
                             <button type="submit" class="nav-link border-0 bg-transparent p-0">
@@ -58,6 +58,19 @@
                     </li>
                     {% endif %}
                 </ul>
+                <form action="{% url 'ad_list' %}" method="get" class="d-flex">
+                    <div class="input-group mx-5">
+                        <input type="text" name="q" class="form-control" id="search-input" placeholder="Поиск..." value="{{ search_query }}">
+                                    <button class="btn btn-search" type="button" id="clear-search"
+                                            style="display: {{ search_query|yesno:'block,none' }};"
+                                            onclick="clearSearch()">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                            <button class="btn btn-search" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                    </div>
+                </form>
             </div>
         </div>
     </nav>

@@ -7,6 +7,7 @@ from .models import Advertisement, Request, Category, Tag
 from .forms import AdvertisementForm, TagForm
 from django.core.paginator import Paginator
 from django.db.models import F
+from django.db.models import Q
 
 class MainPageView(TemplateView):
     template_name = 'board/main_page.html'
@@ -17,6 +18,23 @@ class AdListView(ListView):
     context_object_name = 'ads'
     ordering = ['-created_at']
     paginate_by = 9
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('q')
+
+        if search_query and search_query.strip():
+            search = search_query.strip()
+            queryset = queryset.filter(Q(title__iregex=search))
+
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_query = self.request.GET.get('q', '')
+        context['is_search'] = bool(search_query)
+        context['search_query'] = search_query
+        return context
 
 class AdDetailView(DetailView):
     model = Advertisement

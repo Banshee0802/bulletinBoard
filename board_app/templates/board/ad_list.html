@@ -47,7 +47,7 @@
 
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=1" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page=1" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
                                         &laquo;&laquo;
                                     </a>
                                 </li>
@@ -61,7 +61,7 @@
 
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
                                         &laquo;
                                     </a>
                                 </li>
@@ -82,7 +82,7 @@
                                     </li>
                                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                        <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ num }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
                                             {{ num }}
                                         </a>
                                     </li>
@@ -91,7 +91,7 @@
 
                             {% if page_obj.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
                                         &raquo;
                                     </a>
                                 </li>
@@ -105,7 +105,7 @@
 
                             {% if page_obj.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
+                                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" style="background-color: #E6E6FA; color: #8484f8ff; border-color: #8484f8ff;">
                                         &raquo;&raquo;
                                     </a>
                                 </li>

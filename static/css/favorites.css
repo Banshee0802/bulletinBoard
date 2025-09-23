@@ -1,0 +1,43 @@
+.favorite-btn {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.favorite-btn:hover {
+    background: #8484f8ff;
+    transform: translateY(-1px);
+}
+
+.favorite-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.heart {
+    color: #ccc;
+    transition: color 0.3s;
+    font-size: 1.2em;
+}
+
+.heart.active {
+    color: #ff4757;
+}
+
+.favorite-btn {
+    border-color: #8484f8ff;
+    color: #8484f8ff;
+}
+
+.favorite-btn:hover {
+    background-color: #E6E6FA;
+    border-color: #8484f8ff;
+}

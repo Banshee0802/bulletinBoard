@@ -3,11 +3,17 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Advertisement, Request, Category, Tag
+from .models import Advertisement, Request, Category, Tag, Favorite
 from .forms import AdvertisementForm, TagForm
 from django.core.paginator import Paginator
 from django.db.models import F
 from django.db.models import Q
+from django.http import JsonResponse
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
 
 class MainPageView(TemplateView):
     template_name = 'board/main_page.html'
@@ -34,6 +40,13 @@ class AdListView(ListView):
         search_query = self.request.GET.get('q', '')
         context['is_search'] = bool(search_query)
         context['search_query'] = search_query
+
+        if self.request.user.is_authenticated:
+            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
+            context['user_favorites'] = list(user_favorites)
+        else:
+            context['user_favorites'] = []
+
         return context
 
 class AdDetailView(DetailView):
@@ -57,13 +70,21 @@ class AdDetailView(DetailView):
         advertisement = self.get_object()
         
         has_requested = False
+        is_favorite = False
+
         if self.request.user.is_authenticated:
             has_requested = Request.objects.filter(
                 advertisement=advertisement,
                 sender=self.request.user
             ).exists()
+
+            is_favorite = Favorite.objects.filter(
+                user=self.request.user,
+                advertisement=advertisement
+            ).exists()
         
         context['has_requested'] = has_requested
+        context['is_favorite'] = is_favorite
         return context
 
 class AdCreateView(LoginRequiredMixin, CreateView):
@@ -159,6 +180,13 @@ class AdsByCategoryView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = self.category
+
+        if self.request.user.is_authenticated:
+            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
+            context['user_favorites'] = list(user_favorites)
+        else:
+            context['user_favorites'] = []
+
         return context
 
 class CategoryListView(ListView):
@@ -178,6 +206,13 @@ class AdsByTagView(ListView):
         context = super().get_context_data(**kwargs)
         context['tag'] = self.tag
         context['title'] = f'Объявления с тегом "{self.tag.name}"'
+
+        if self.request.user.is_authenticated:
+            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
+            context['user_favorites'] = list(user_favorites)
+        else:
+            context['user_favorites'] = []
+
         return context
 
 class AddTagView(LoginRequiredMixin, CreateView):
@@ -213,5 +248,30 @@ class AdminAdsView(ListView):
 
     def get_queryset(self):
         return Advertisement.objects.filter(user__is_superuser=True).order_by('-created_at')
+    
+
+class ToggleFavoriteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            ad_id = data.get('ad_id')
+
+            if not ad_id:
+                return JsonResponse({'success': False, 'error': 'No ad_id provided'})
+            
+            ad = Advertisement.objects.get(id=ad_id)
+            favorite, created = Favorite.objects.get_or_create(user=request.user, advertisement=ad)
+
+            if not created:
+                favorite.delete()
+                
+                return JsonResponse({'success': True, 'action': 'removed', 'is_favorite': False})
+            
+            return JsonResponse({'success': True, 'action': 'added', 'is_favorite': True})
+        
+        except Advertisement.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Advertisement not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
     
         

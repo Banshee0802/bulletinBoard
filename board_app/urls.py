@@ -15,4 +15,5 @@ urlpatterns = [
     path('ads/category/<slug:category_slug>/', views.AdsByCategoryView.as_view(), name='ads_by_category'),
     path('ads/categories/', views.CategoryListView.as_view(), name='ad_categories'),
     path('ads/admin-ads/', views.AdminAdsView.as_view(), name='admin_ads'),
+    path('toggle-favorite/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
 ]

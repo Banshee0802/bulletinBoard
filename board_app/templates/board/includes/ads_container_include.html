@@ -25,6 +25,17 @@
         >
       </h3>
       
+      {% if user.is_authenticated %}
+      <div class="mb-3">
+        <button class="favorite-btn" data-ad-id="{{ advertisement.id }}">
+          <span class="heart {% if advertisement.id in user_favorites %}active{% endif %}">❤</span>
+          <span class="favorite-text">
+            {% if advertisement.id in user_favorites %}В избранном{% else %}В избранное{% endif %}
+          </span>
+        </button>
+      </div>
+      {% endif %}
+      
       <div class="mt-auto pt-2">
         <small class="text-muted"
           >Создано: {{ advertisement.created_at|localtime|date:'d.m.y' }}</small

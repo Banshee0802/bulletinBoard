@@ -16,6 +16,17 @@
         <h2 class="card-title mb-3" style="color: #000000ff">{{ advertisement.title }}</h2>
         <p>{{ advertisement.description }}</p>
 
+        {% if user.is_authenticated and request.user != advertisement.user %}
+        <div class="mb-3">
+            <button class="favorite-btn" data-ad-id="{{ advertisement.id }}">
+                <span class="heart {% if is_favorite %}active{% endif %}">❤</span>
+                <span class="favorite-text">
+                    {% if is_favorite %}Удалить из избранного{% else %}Добавить в избранное{% endif %}
+                </span>
+            </button>
+        </div>
+        {% endif %}
+
         {% if advertisement.category %}
         <p>
             <strong>Категория:</strong>

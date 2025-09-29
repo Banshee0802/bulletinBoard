@@ -1,19 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Advertisement, Request, Category, Tag, Favorite
 from .forms import AdvertisementForm, TagForm
-from django.core.paginator import Paginator
 from django.db.models import F
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 import json
+from django.contrib import messages
 
 class MainPageView(TemplateView):
     template_name = 'board/main_page.html'
@@ -103,9 +100,11 @@ class AdCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         response = super().form_valid(form)
         form.save_m2m()
+        messages.success(self.request, 'Пост успешно создан!')
         return response
     
     def form_invalid(self, form):
+        messages.error(self.request, 'Ошибка при создании поста')
         return self.render_to_response(self.get_context_data(form=form))
     
     def get_success_url(self):
@@ -126,9 +125,11 @@ class AdUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         form.save_m2m()
+        messages.success(self.request, 'Пост успешно обновлен!')
         return response
     
     def form_invalid(self, form):
+        messages.error(self.request, 'Ошибка при редактировании поста')
         return self.render_to_response(self.get_context_data(form=form))
     
     def get_success_url(self):

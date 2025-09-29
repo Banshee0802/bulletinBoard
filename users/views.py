@@ -1,17 +1,15 @@
 from django.views import View
-from django.views.generic import CreateView, TemplateView, UpdateView
+from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth import login, get_user_model, authenticate
 from .forms import RegisterForm, LoginForm
-from django.conf import settings
 from board_app.models import Advertisement, Request
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import resolve_url
+from django.contrib import messages
 
 
 User = get_user_model()
@@ -25,7 +23,16 @@ class RegisterView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         user = form.save()
-        login(self.request, user)
+        
+        user = authenticate(
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password1']
+        )
+        
+        if user is not None:
+            login(self.request, user)
+            messages.success(self.request, 'Регистрация прошла успешно!')
+        
         return response
         
     
@@ -40,10 +47,18 @@ class CustomLoginView(LoginView):
             return next_url
         return reverse_lazy('ad_list') 
     
+    def form_valid(self, form):
+        messages.success(self.request, 'Вы успешно вошли!')
+        return super().form_valid(form)
+        
+    def form_invalid(self, form):
+        messages.error(self.request, 'Неверный логин или пароль')
+        return super().form_invalid(form)  
+    
 
 class CustomLogoutView(LogoutView):
     next_page = 'ad_list'
-
+    
 
 class ProfileView(TemplateView):
     template_name = 'users/profile.html'

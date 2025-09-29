@@ -1,34 +1,57 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(label='Email', required=True)
+    email = forms.EmailField(label='Email', 
+                             required=True, 
+                             widget=forms.EmailInput(attrs={'class': 'form-control'}))
     
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']  
         widgets = {
             'username': forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'exampleInputEmail',
                 'placeholder': 'Введите логин'
             }),
-            'email': forms.EmailInput(attrs={
+        }  
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+        
+            self.fields['password1'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Введите email'
-        }),
-            'password1': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'id': 'exampleInputPassword1',
-                'placeholder': 'Введите пароль',
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'id': 'exampleInputPassword1',
-                'placeholder': 'Подтвердите пароль',
-            }),
-        } 
+            'placeholder': 'Введите пароль'
+        })
+            self.fields['password2'].widget.attrs.update({
+            'class': 'form-control', 
+            'placeholder': 'Подтвердите пароль'
+        })
+        
+            self.fields['password1'].help_text = ''
+            self.fields['password2'].help_text = ''
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        
+        if not password1:
+            return password1
+            
+        if len(password1) < 8:
+            raise ValidationError('Пароль должен содержать минимум 8 символов.')
+        
+        if password1.isdigit():
+            raise ValidationError('Пароль не может состоять только из цифр.')
+            
+        common_passwords = ['password', 'qwerty111', 'qwerty123', 'ytrewq321']
+        if password1.lower() in common_passwords:
+            raise ValidationError('Этот пароль слишком распространён.')
+            
+        return password1  
+
+    def _post_clean(self):
+        super(forms.ModelForm, self)._post_clean()   
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -47,16 +70,12 @@ class LoginForm(AuthenticationForm):
         label='Email или логин', 
         max_length=50, 
         widget=forms.TextInput(attrs={
-                'class': 'form-control',
-                'id': 'exampleInputEmail',
-                'placeholder': 'Введите логин'
-            })
+            'placeholder': 'Введите email или логин'
+        })
     )
     password = forms.CharField(
         label='Пароль',
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
             'placeholder': 'Введите пароль',
-            'id': 'inputPassword'
         })
     )

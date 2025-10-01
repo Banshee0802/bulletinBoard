@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.MainPageView.as_view(), name='main_page'),
     path('ads/', views.AdListView.as_view(), name='ad_list'),
+    path('ads/load-more/', views.LoadMoreAdsView.as_view(), name='load_more_ads'),
     path('ad/<int:pk>/', views.AdDetailView.as_view(), name='ad_detail'),
     path('ad/<int:pk>/edit/', views.AdUpdateView.as_view(), name='ad_edit'),
     path('ad/<slug:slug>/delete/', views.AdDeleteView.as_view(), name='ad_delete'),

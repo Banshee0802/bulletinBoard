@@ -10,41 +10,55 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
 import json
+import time
 from django.contrib import messages
+from django.template.loader import render_to_string
 
 class MainPageView(TemplateView):
     template_name = 'board/main_page.html'
+
+
+class AdSearchView(ListView):
+    model = Advertisement
+    template_name = 'board/ad_list.html'
+    context_object_name = 'ads'
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset = Advertisement.objects.all().order_by('-created_at')
+        search_query = self.request.GET.get('q', '').strip()
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_query = self.request.GET.get('q', '')
+        context['search_query'] = search_query
+        context['is_search'] = bool(search_query)
+        return context
+
 
 class AdListView(ListView):
     model = Advertisement
     template_name = 'board/ad_list.html'
     context_object_name = 'ads'
-    ordering = ['-created_at']
-    paginate_by = 9
+    paginate_by = 6 
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        search_query = self.request.GET.get('q')
+        return Advertisement.objects.all().order_by('-created_at')
 
-        if search_query and search_query.strip():
-            search = search_query.strip()
-            queryset = queryset.filter(Q(title__iregex=search))
-
-        return queryset
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_query = self.request.GET.get('q', '')
-        context['is_search'] = bool(search_query)
-        context['search_query'] = search_query
-
-        if self.request.user.is_authenticated:
-            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
-            context['user_favorites'] = list(user_favorites)
-        else:
-            context['user_favorites'] = []
+        context['is_search'] = False
+        context['search_query'] = ''
+        context['has_more'] = self.get_queryset().count() > self.paginate_by
 
         return context
+
 
 class AdDetailView(DetailView):
     model = Advertisement
@@ -171,24 +185,22 @@ class SendRequestView(LoginRequiredMixin, DetailView):
         return redirect('ad_detail', pk=advertisement.id)
 
 class AdsByCategoryView(ListView):
+    model = Advertisement
     template_name = 'board/ad_list.html'
     context_object_name = 'ads'
-    
+    paginate_by = 6
+
     def get_queryset(self):
-        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
-        return Advertisement.objects.filter(category=self.category)
-    
+        category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        return Advertisement.objects.filter(category=category).order_by('-created_at')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['category'] = self.category
-
-        if self.request.user.is_authenticated:
-            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
-            context['user_favorites'] = list(user_favorites)
-        else:
-            context['user_favorites'] = []
-
+        context['category'] = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        context['is_search'] = False
+        context['search_query'] = ''
         return context
+
 
 class CategoryListView(ListView):
     model = Category
@@ -196,25 +208,23 @@ class CategoryListView(ListView):
     context_object_name = 'categories'
 
 class AdsByTagView(ListView):
+    model = Advertisement
     template_name = 'board/ads_by_tag.html'
     context_object_name = 'ads'
-    
+    paginate_by = 6
+
     def get_queryset(self):
-        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
-        return Advertisement.objects.filter(tags=self.tag).order_by('-created_at')
-    
+        tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Advertisement.objects.filter(tags=tag).order_by('-created_at')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tag'] = self.tag
-        context['title'] = f'Объявления с тегом "{self.tag.name}"'
-
-        if self.request.user.is_authenticated:
-            user_favorites = Favorite.objects.filter(user=self.request.user).values_list('advertisement_id', flat=True)
-            context['user_favorites'] = list(user_favorites)
-        else:
-            context['user_favorites'] = []
-
+        context['tag'] = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        context['title'] = f'Объявления с тегом "{context["tag"].name}"'
+        context['is_search'] = False
+        context['search_query'] = ''
         return context
+
 
 class AddTagView(LoginRequiredMixin, CreateView):
     model = Tag
@@ -246,9 +256,16 @@ class AdminAdsView(ListView):
     model = Advertisement
     template_name = 'board/admin_ads.html'
     context_object_name = 'ads'
+    paginate_by = 6
 
     def get_queryset(self):
         return Advertisement.objects.filter(user__is_superuser=True).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_search'] = False
+        context['search_query'] = ''
+        return context
     
 
 class ToggleFavoriteView(LoginRequiredMixin, View):

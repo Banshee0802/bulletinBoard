@@ -58,6 +58,29 @@ class AdListView(ListView):
         context['has_more'] = self.get_queryset().count() > self.paginate_by
 
         return context
+    
+
+class LoadMoreAdsView(View):
+
+    def get(self, request):
+        time.sleep(1) 
+
+        offset = int(request.GET.get('offset'))
+        paginate_by = 6
+        ads_queryset = Advertisement.objects.all().order_by('-created_at')
+        ads = ads_queryset[offset:offset + paginate_by]
+
+        html = ''.join([
+            render_to_string('board/includes/ads_container_include.html', {'advertisement': ad}, request)
+            for ad in ads
+        ])
+
+        has_more = offset + paginate_by < ads_queryset.count()
+
+        return JsonResponse({
+            'html': html,
+            'has_more': has_more,
+        })
 
 
 class AdDetailView(DetailView):

@@ -214,3 +214,7 @@ h2, h3 {
         opacity: 1;
     }
 }
+
+.custom-spinner {
+    background-color:  #8484f8ff;
+}

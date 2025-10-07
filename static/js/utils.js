@@ -15,3 +15,32 @@ function getCSRFToken() {
     }
     return cookieValue;
 }
+
+
+export async function adAction(url, data = {}) {
+    const formData = new FormData();
+    
+    for (const key in data) {
+        formData.append(key, data[key]);
+    }
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: formData
+        });
+        
+        if (response.redirected) {
+            window.location.href = response.url;
+            return { redirected: true };
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error in adAction:', error);
+        throw error;
+    }
+}

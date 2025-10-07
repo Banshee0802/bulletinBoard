@@ -16,16 +16,17 @@
         <h2 class="card-title mb-3" style="color: #000000ff">{{ advertisement.title }}</h2>
         <p>{{ advertisement.description }}</p>
 
-        {% if user.is_authenticated and request.user != advertisement.user %}
-        <div class="mb-3">
-            <button class="favorite-btn" data-ad-id="{{ advertisement.id }}">
-                <span class="heart {% if is_favorite %}active{% endif %}">❤</span>
-                <span class="favorite-text">
-                    {% if is_favorite %}Удалить из избранного{% else %}Добавить в избранное{% endif %}
-                </span>
-            </button>
-        </div>
-        {% endif %}
+        <button 
+            class='favoriteBtn btn btn-link {% if request.user == advertisement.user %}disabled{% endif %}' 
+            data-url='{% url "toggle_favorite" %}'
+            data-ad-id='{{ advertisement.id }}'>
+          {% if request.user in advertisement.favorites.all %}
+            <i class='favoriteIcon bi bi-bookmark-fill'></i>
+          {% else %}
+            <i class='favoriteIcon bi bi-bookmark'></i>
+          {% endif %}
+        </button>
+        <span class='favoriteCount'>{{ advertisement.favorites.count }}</span>
 
         {% if advertisement.category %}
         <p>

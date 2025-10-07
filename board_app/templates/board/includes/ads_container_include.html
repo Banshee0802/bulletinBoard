@@ -1,6 +1,6 @@
 {% load tz %}
 
-<div class="col-lg-4 col-md-6 mb-4 my-3">
+<div class="adCard col-lg-4 col-md-6 mb-4 my-3" data-ad-id="{{ advertisement.id }}">
   <div class="card text-dark h-100" style="background-color: #ffdfe7ff">
     <div class="card-body d-flex flex-column">
       {% if advertisement.image %}
@@ -24,18 +24,22 @@
           >{{ advertisement.title }}</a
         >
       </h3>
-      
-      {% if user.is_authenticated %}
-      <div class="mb-3">
-        <button class="favorite-btn" data-ad-id="{{ advertisement.id }}">
-          <span class="heart {% if advertisement.id in user_favorites %}active{% endif %}">❤</span>
-          <span class="favorite-text">
-            {% if advertisement.id in user_favorites %}В избранном{% else %}В избранное{% endif %}
-          </span>
+
+      <!-- Избранное -->
+      <div style="display: inline-flex; align-items: center; gap: 5px;">
+        <button 
+            class='favoriteBtn btn btn-link {% if request.user == advertisement.user %}disabled{% endif %}' 
+            data-url='{% url "toggle_favorite" %}'
+            data-ad-id='{{ advertisement.id }}'>
+          {% if request.user in advertisement.favorites.all %}
+            <i class='favoriteIcon bi bi-bookmark-fill'></i>
+          {% else %}
+            <i class='favoriteIcon bi bi-bookmark'></i>
+          {% endif %}
         </button>
+          <span class='favoriteCount'>{{ advertisement.favorites.count }}</span>
       </div>
-      {% endif %}
-      
+      <!--Дата и время-->
       <div class="mt-auto pt-2">
         <small class="text-muted"
           >Создано: {{ advertisement.created_at|localtime|date:'d.m.y' }}</small

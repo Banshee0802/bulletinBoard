@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Advertisement, Request, Category, Tag, Favorite
+from .models import Advertisement, Request, Category, Tag
 from .forms import AdvertisementForm, TagForm
 from django.db.models import F
 from django.db.models import Q
@@ -61,7 +61,6 @@ class AdListView(ListView):
     
 
 class LoadMoreAdsView(View):
-
     def get(self, request):
         time.sleep(1) 
 
@@ -71,7 +70,7 @@ class LoadMoreAdsView(View):
         ads = ads_queryset[offset:offset + paginate_by]
 
         html = ''.join([
-            render_to_string('board/includes/ads_container_include.html', {'advertisement': ad}, request)
+            render_to_string('board/includes/ads_container_include.html', {'advertisement': ad, 'request': request}, request)
             for ad in ads
         ])
 
@@ -111,11 +110,8 @@ class AdDetailView(DetailView):
                 advertisement=advertisement,
                 sender=self.request.user
             ).exists()
-
-            is_favorite = Favorite.objects.filter(
-                user=self.request.user,
-                advertisement=advertisement
-            ).exists()
+            
+            is_favorite = self.request.user in advertisement.favorites.all()
         
         context['has_requested'] = has_requested
         context['is_favorite'] = is_favorite
@@ -293,26 +289,29 @@ class AdminAdsView(ListView):
 
 class ToggleFavoriteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-            ad_id = data.get('ad_id')
-
-            if not ad_id:
-                return JsonResponse({'success': False, 'error': 'No ad_id provided'})
-            
-            ad = Advertisement.objects.get(id=ad_id)
-            favorite, created = Favorite.objects.get_or_create(user=request.user, advertisement=ad)
-
-            if not created:
-                favorite.delete()
-                
-                return JsonResponse({'success': True, 'action': 'removed', 'is_favorite': False})
-            
-            return JsonResponse({'success': True, 'action': 'added', 'is_favorite': True})
+        advertisement_id = request.POST.get('advertisement_id')
+        advertisement = get_object_or_404(Advertisement, pk=advertisement_id)
         
-        except Advertisement.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Advertisement not found'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+        if request.user in advertisement.favorites.all():
+            advertisement.favorites.remove(request.user)
+            is_favorite = False
+        else:
+            advertisement.favorites.add(request.user)
+            is_favorite = True
+
+        return JsonResponse({
+            'is_favorite': is_favorite,
+            'favorites_count': advertisement.favorites.count()
+        })
+        
+
+class FavoriteListView(ListView):
+    model = Advertisement
+    template_name = 'board/favorite_ads.html'
+    context_object_name = 'ads'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return self.request.user.favorite_ads.all().order_by('-created_at')
     
         

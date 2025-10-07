@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Избранное{% endblock title %}
+
+{% block content %}
+  <h1>Избранное</h1>
+    <div class='container'>
+        {% for advertisement in ads %}
+            {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
+        {% empty %}
+            <p>Пусто</p>
+        {% endfor %}
+    </div>
+
+{% endblock content %}

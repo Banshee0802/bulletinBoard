@@ -5,15 +5,15 @@
 {% block content %}
 
     {% if user == request.user %}
-        <h2>Ваш профиль</h2>
+        <h2 class='my-5'>Ваш профиль</h2>
     {% else %}
         <h2>Профиль {{ user.username }}</h2>
     {% endif %}
 
     {% if user == request.user %}
-        <h3 class='my-4'>Отклики на ваши объявления</h3>
+        <h4 class='my-4 d-inline'>Отклики на ваши объявления:</h4>
     {% else %}
-        <h3 class='my-1'>Отклики на объявления пользователя {{ user.username }}</h3>
+        <h5 class='my-4'>Отклики на объявления пользователя {{ user.username }}</h5>
     {% endif %}
 
     {% if requests %}
@@ -34,16 +34,23 @@
         {% endfor %}
         </ul>
     {% else %}
-        <p>Откликов нет</p>
+        <span class='mx-3'>откликов пока нет</span>
     {% endif %}
 
+    {% if user == request.user %}
+        <div class="my-4">
+            <a href="{% url 'favorite_list' %}" class="btn btn-custom">💖 Ваши избранные объявления</a>
+        </div>
+    {% endif %}
+
+
     {% if ads %}
-        <h2>Объявления</h2>
+        <h2>Ваши объявления</h2>
         {% for advertisement in ads %}
         {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
         {% endfor %}
     {% else %}
-        <p>Объявлений нет</p>
+        <p class='my-4'>Объявлений нет. Создайте ваше первое объявление!</p>
     {% endif %}
 
 {% endblock content %}

@@ -43,6 +43,7 @@ class Advertisement(models.Model):
     tags = models.ManyToManyField(Tag, blank=True, related_name='ads', verbose_name='Теги')
     updated_at = models.DateTimeField(auto_now=True)
     views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
+    favorites = models.ManyToManyField(User, related_name='favorite_ads', blank=True, verbose_name='В избранном у')
 
     class Meta:
         verbose_name = 'Объявление'
@@ -103,14 +104,3 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория объявлений'
         verbose_name_plural = 'Категории объявлений'
-
-
-class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
-    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE, related_name='favorites')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ['user', 'advertisement']
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранные'

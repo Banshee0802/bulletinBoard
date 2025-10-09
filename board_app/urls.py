@@ -19,4 +19,6 @@ urlpatterns = [
     path('ads/admin-ads/', views.AdminAdsView.as_view(), name='admin_ads'),
     path('toggle-favorite/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
     path('favorites/', views.FavoriteListView.as_view(), name='favorite_list'),
+    path('ads/<int:pk>/comments/add/', views.AddCommentView.as_view(), name='add_comment'),
+    path('comments/<int:pk>/delete/', views.DeleteCommentView.as_view(), name='delete_comment'),
 ]

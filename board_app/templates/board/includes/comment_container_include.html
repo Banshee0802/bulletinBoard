@@ -1,0 +1,16 @@
+<div class="card mb-2 p-2" id="comment-{{ comment.id }}" style="background-color: #ffd1dc94;">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <strong style="color: #000000b7;">{{ comment.author }}</strong>
+            <small class="text-muted"> • {{ comment.created_at|date:'Y-m-d H:i:s' }}</small>
+            <p style="color: #000000b7;">{{ comment.text }}</p>
+        </div>
+        {% if request.user == comment.author %}
+        <button class="btn btn-sm btn-outline-danger delete-comment-btn"
+                data-url="{% url 'delete_comment' comment.id %}">
+            Удалить
+        </button>
+        {% endif %}
+    </div>
+</div>
+

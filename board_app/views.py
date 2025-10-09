@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Advertisement, Request, Category, Tag
+from .models import Advertisement, Request, Category, Tag, Comment
 from .forms import AdvertisementForm, TagForm
 from django.db.models import F
 from django.db.models import Q
@@ -315,3 +315,41 @@ class FavoriteListView(ListView):
         return self.request.user.favorite_ads.all().order_by('-created_at')
     
         
+class AddCommentView(View):
+    def post(self, request, *args, **kwargs):
+        advertisement_id = request.POST.get('advertisement_id')
+        advertisement = get_object_or_404(Advertisement, pk=advertisement_id)
+
+        text = request.POST.get('text', '').strip()
+        if not text:
+            return JsonResponse({'error': 'Текст комментария не может быть пустым'}, status=400)
+        
+        comment = Comment.objects.create(
+            advertisement=advertisement,
+            author=request.user,
+            text=text
+        )
+
+        comment_html = render_to_string(
+            'board/includes/comment_container_include.html',
+            {'comment': comment},
+            request
+        )
+
+        return JsonResponse({
+            'success': True,
+            'comment_html': comment_html,
+            'comments_count': advertisement.comments.count()
+        })
+    
+
+class DeleteCommentView(View):
+    def post(self, request, *args, **kwargs):
+        comment_id = kwargs.get('pk')
+        comment = get_object_or_404(Comment, pk=comment_id)
+
+        if comment.author != request.user:
+            return JsonResponse({'error': 'Вы не можете удалить этот комментарий.'}, status=403)
+
+        comment.delete()
+        return JsonResponse({'success': True, 'comment_id': comment_id})

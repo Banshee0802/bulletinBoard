@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock title %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/minty/bootstrap.min.css" integrity="sha384-H4X+4tKc7b8s4GoMrylmy2ssQYpDHoqzPa9aKXbDwPoPUA3Ra8PA5dGzijN+ePnH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -17,7 +18,7 @@
 <body>
     <nav class="navbar navbar-expand-lg" style="background-color: #b3b3ffff;" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" style='color: #164355ff' href="{% url 'main_page' %}"><strong>Лотос</strong></a>
+            <a class="navbar-brand" href="{% url 'main_page' %}"><img src="{% static 'images/logo/lotos.png' %}" alt="Логотип" height="60" style="transform: translateY(-4px);"></a>
             <button class="navbar-toggler" type="button">
                 <span class="navbar-toggler-icon"></span>
             </button>

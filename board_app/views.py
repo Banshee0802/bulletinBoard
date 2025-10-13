@@ -86,6 +86,7 @@ class AdDetailView(DetailView):
     model = Advertisement
     template_name = 'board/ad_detail.html'
     context_object_name = 'advertisement'
+    comments_paginate_by = 6
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -115,6 +116,11 @@ class AdDetailView(DetailView):
         
         context['has_requested'] = has_requested
         context['is_favorite'] = is_favorite
+
+        comments_query = advertisement.comments.all().order_by('-created_at')
+        context['comments'] = comments_query[:self.comments_paginate_by]
+        context['has_more_comments'] = comments_query.count() > self.comments_paginate_by
+        context['comments_paginate_by'] = self.comments_paginate_by
         return context
 
 class AdCreateView(LoginRequiredMixin, CreateView):
@@ -319,6 +325,7 @@ class AddCommentView(View):
     def post(self, request, *args, **kwargs):
         advertisement_id = request.POST.get('advertisement_id')
         advertisement = get_object_or_404(Advertisement, pk=advertisement_id)
+        comments_paginate_by = 6
 
         text = request.POST.get('text', '').strip()
         if not text:
@@ -351,5 +358,30 @@ class DeleteCommentView(View):
         if comment.author != request.user:
             return JsonResponse({'error': 'Вы не можете удалить этот комментарий.'}, status=403)
 
+        comment_id = comment.id
         comment.delete()
         return JsonResponse({'success': True, 'comment_id': comment_id})
+    
+
+class LoadMoreCommentsView(View):
+    def get(self, request, pk):
+        time.sleep(1) 
+        offset = int(request.GET.get('offset', 0))
+        comments_paginate_by = AdDetailView.comments_paginate_by 
+        
+        advertisement = get_object_or_404(Advertisement, pk=pk)
+        comments_query = advertisement.comments.all().order_by('-created_at')
+        
+        comments = comments_query[offset:offset + comments_paginate_by]
+
+        comments_html = ''.join([
+            render_to_string('board/includes/comment_container_include.html', {'comment': comment}, request)
+            for comment in comments
+        ])
+
+        has_more_comments = offset + comments_paginate_by < comments_query.count()
+
+        return JsonResponse({
+            'html': comments_html,
+            'has_more': has_more_comments
+        })

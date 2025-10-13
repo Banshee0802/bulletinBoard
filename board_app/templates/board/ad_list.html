@@ -41,7 +41,8 @@
                         data-initial-offset='{{ ads|length }}' 
                         data-has-more='{{ has_more|yesno:"true,false" }}'
                         data-url='{% url "load_more_ads" %}'
-                        data-search-query="{{ search_query }}">
+                        data-search-query="{{ search_query }}"
+                        data-trigger-type='scroll'>
                         {% for advertisement in ads %}
                             {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
                         {% endfor %}

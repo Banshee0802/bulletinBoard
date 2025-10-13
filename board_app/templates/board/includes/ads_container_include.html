@@ -17,6 +17,7 @@
         "
       />
       {% endif %}
+      
       <h3 class="card-title mb-3 my-3">
         <a
           href="{% url 'ad_detail' advertisement.id %}"
@@ -25,27 +26,44 @@
         >
       </h3>
 
-      <!-- Избранное -->
-      <div style="display: inline-flex; align-items: center; gap: 5px;">
-        <button 
-            class='favoriteBtn btn btn-link {% if request.user == advertisement.user %}disabled{% endif %}' 
+      
+      <div class="d-flex align-items-center gap-4 mb-3">
+        <!-- Избранное -->
+        <div class="d-flex align-items-center gap-2 mx-2">
+          <button 
+            class='favoriteBtn btn btn-link p-0 {% if request.user == advertisement.user %}disabled{% endif %}' 
             data-url='{% url "toggle_favorite" %}'
-            data-ad-id='{{ advertisement.id }}'>
-          {% if request.user in advertisement.favorites.all %}
-            <i class='favoriteIcon bi bi-bookmark-fill'></i>
-          {% else %}
-            <i class='favoriteIcon bi bi-bookmark'></i>
-          {% endif %}
-        </button>
-          <span class='favoriteCount'>{{ advertisement.favorites.count }}</span>
+            data-ad-id='{{ advertisement.id }}'
+          >
+            {% if request.user in advertisement.favorites.all %}
+              <i class='favoriteIcon bi bi-bookmark-fill'></i>
+            {% else %}
+              <i class='favoriteIcon bi bi-bookmark'></i>
+            {% endif %}
+          </button>
+          <span class='favoriteCount small mx-2'>{{ advertisement.favorites.count }}</span>
+        </div>
+
+        <!-- Комментарии -->
+        <div class="d-flex align-items-center gap-2 mx-2">
+          <i class="bi bi-chat-left-text text-muted fs-6"></i>
+          <span class="small text-muted mx-2">{{ advertisement.comments.count }}</span>
+        </div>
+
+        <!-- Просмотры -->
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-eye text-muted fs-6"></i>
+          <span class="small text-muted mx-2">{{ advertisement.views }}</span>
+        </div>
       </div>
+
       <!--Дата и время-->
-      <div class="mt-auto pt-2">
+      <div class="mt-auto pt-3">
         <small class="text-muted"
           >Создано: {{ advertisement.created_at|localtime|date:'d.m.y' }}</small
         ><br>
         <small class="text-muted"
-          >Последнее обновление: {{ advertisement.updated_at|date:'d.m.y' }}</small
+          >Обновлено: {{ advertisement.updated_at|date:'d.m.y' }}</small
         >
       </div>
     </div>

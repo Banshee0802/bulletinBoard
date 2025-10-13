@@ -1,3 +1,5 @@
+import { adAction } from "/static/js/utils.js";
+import { formatDatesHTML } from "/static/js/format-dates.js";
 
 // функция для бесконечного скролла
 class InfiniteScroll {
@@ -6,6 +8,7 @@ class InfiniteScroll {
         this.offset = Number(this.container.dataset.initialOffset);
         this.url = this.container.dataset.url;
         this.hasMore = this.container.dataset.hasMore === 'true';
+        this.triggerType = this.container.dataset.triggerType;
         this.loading = false;
         this.paginateBy = 6;
 
@@ -13,28 +16,49 @@ class InfiniteScroll {
     }
 
     init() {
-        window.addEventListener('scroll', () => {
+        if (this.triggerType === 'scroll') {
+          window.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 1)) {
-                this.loadMoreAds();
+                this.loadMore();
             }
         });
+    } else if (this.triggerType === 'button') {
+        this.loadMoreBtn = document.getElementById(this.container.dataset.loadMoreBtn);
+        if (this.loadMoreBtn) {
+            this.loadMoreBtn.addEventListener('click', () => {
+                this.loadMore()
+            })
+        }
     }
-
-    async loadMoreAds() {
+}
+    async loadMore() {
         if (this.loading || !this.hasMore) return;
 
         this.loading = true;
         this.showLoadingSpinner();
+        if (this.triggerType === 'button') {
+            this.hideLoadMoreButton();
+        }
 
         try {
             const response = await fetch(`${this.url}?offset=${this.offset}`);
             const data = await response.json();
 
-            this.container.insertAdjacentHTML('beforeend', data.html);
+            const formattedHTML = formatDatesHTML(data.html);
+
+            this.container.insertAdjacentHTML('beforeend', formattedHTML);
             this.offset += this.paginateBy;
             this.hasMore = data.has_more;
+
+            if (this.triggerType === 'button' && this.hasMore) {
+                this.showLoadMoreButton();
+            }
         } catch (error) {
             console.error('Ошибка загрузки:', error);
+
+            if (this.triggerType === 'button') {
+                this.showLoadMoreButton();
+            }
         } finally {
             this.loading = false;
             this.hideLoadingSpinner();
@@ -48,6 +72,21 @@ class InfiniteScroll {
     hideLoadingSpinner() {
         document.getElementById('loadingSpinner')?.classList.add('d-none');
     }
+
+    showLoadMoreButton() {
+        this.loadMoreBtn.classList.remove('d-none');
+    }
+
+    hideLoadMoreButton() {
+        this.loadMoreBtn.classList.add('d-none');
+    }
 }
 
-    new InfiniteScroll('adsContainer');
+document.addEventListener('DOMContentLoaded', () => {
+  const adsContainer = document.getElementById('adsContainer');
+  if (adsContainer) new InfiniteScroll('adsContainer');
+
+  const commentsContainer = document.getElementById('comments-container');
+  if (commentsContainer) new InfiniteScroll('comments-container');
+});
+

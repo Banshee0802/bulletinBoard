@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const text = form.querySelector('textarea[name="text"]').value.trim();
 
     if (!text) {
-      alert('Текст комментария не может быть пустым');
+      alert('Текст отзыва не может быть пустым');
       return;
     }
 
@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
         alert(data.error);
       }
     } catch (error) {
-      console.error('Ошибка при добавлении комментария:', error);
-      alert('Произошла ошибка при отправке комментария.');
+      console.error('Ошибка при добавлении отзыва:', error);
+      alert('Произошла ошибка при отправке отзыва.');
     }
   });
 });
@@ -46,7 +46,7 @@ document.addEventListener('click', async function(e) {
     const btn = e.target;
     const url = btn.dataset.url;
 
-    if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) return;
+    if (!confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
 
     try {
       const data = await adAction(url, {});
@@ -61,7 +61,7 @@ document.addEventListener('click', async function(e) {
         alert(data.error);
       }
     } catch (err) {
-      console.error('Ошибка при удалении комментария:', err);
-      alert('Произошла ошибка при удалении комментария.');
+      console.error('Ошибка при удалении отзыва:', err);
+      alert('Произошла ошибка при удалении отзыва.');
     }
   });

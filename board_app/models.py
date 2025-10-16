@@ -109,10 +109,14 @@ class Category(models.Model):
 class Comment(models.Model):
     advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     text = models.TextField(verbose_name='Текст')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        if self.parent:
+            return f'Ответ: {self.author} -> {self.parent.author}: {self.text if len(self.text) < 20 else self.text[:20] + "..."}'
+        
         return f'Комментарий от {self.author} к "{self.advertisement}"'
 
     class Meta:

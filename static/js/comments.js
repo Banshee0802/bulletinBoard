@@ -1,6 +1,7 @@
 "use strict";
 
 import { adAction } from "./utils.js";
+import { formatDate } from "./format-dates.js";
 
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('#comment-form');
@@ -65,3 +66,99 @@ document.addEventListener('click', async function(e) {
       alert('Произошла ошибка при удалении отзыва.');
     }
   });
+
+
+// Ответы на комментарии
+class ReplyManager {
+  constructor() {
+    this.init();
+  }
+  init() {
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.reply-btn')) {
+        this.handleReplyClick(event.target.closest('.reply-btn'));
+      }
+
+      if (event.target.closest('.cancel-reply')) {
+        this.handleCancelReply(event.target.closest('.cancel-reply'))
+      }
+    });
+    document.addEventListener('submit', (event) => {
+      if (event.target.closest('.reply-form')) {
+        event.preventDefault();
+        this.handleReplySubmit(event.target.closest('.reply-form'));
+      }
+    })
+  }
+  handleReplyClick(replyBtn) {
+    const commentId = replyBtn.dataset.commentId;
+    const replyForm = document.getElementById(`replyFormContainer${commentId}`);
+
+    document.querySelectorAll('.reply-form-container').forEach(form => {
+      form.classList.add('d-none');
+    })
+
+    replyForm.classList.remove('d-none');
+    replyForm.querySelector('textarea').focus();
+  }
+
+  handleCancelReply(cancelBtn) {
+    const replyForm = cancelBtn.closest('.reply-form-container');
+    replyForm.classList.add('d-none');
+    replyForm.querySelector('textarea').value = '';
+  }
+
+  async handleReplySubmit(form) {
+    const textarea = form.querySelector('textarea');
+    const text = textarea.value.trim();
+    if (!text) {
+      alert('Введите текст ответа');
+      return;
+    }
+    const advertisementId = form.dataset.advertisementId;
+    const parentId = form.dataset.parentId;
+    const url = `/ads/${advertisementId}/comments/add/`;
+
+    const requestData = {
+      advertisement_id: advertisementId,
+      text,
+      parentId
+    };
+
+    try {
+      const data = await adAction(url, requestData);
+
+    if (data.success) {
+      textarea.value = '';
+      form.closest('.reply-form-container').classList.add('d-none');
+
+      const commentContainer = form.closest('.comment-container');
+      let repliesContainer = commentContainer.querySelector('.replies');
+
+      if (!repliesContainer) {
+        repliesContainer = document.createElement('div');
+        repliesContainer.classList.add('mt-3', 'ms-3', 'border-start', 'ps-3', 'replies');
+        commentContainer.appendChild(repliesContainer);
+      }
+
+      repliesContainer.insertAdjacentHTML('beforeend', data.comment_html);
+
+      const newReply = repliesContainer.lastElementChild;
+      const dateElement = newReply.querySelector('.date-field');
+      formatDate(dateElement);
+
+      const commentsCountElement = document.querySelector('#comments-count');
+        if (commentsCountElement) {
+          commentsCountElement.textContent = data.comments_count;
+        }
+      } else {
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке ответа:', error);
+      alert('Произошла ошибка при отправке ответа.');
+    }
+  }
+}
+
+new ReplyManager();

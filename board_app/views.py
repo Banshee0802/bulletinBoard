@@ -117,7 +117,7 @@ class AdDetailView(DetailView):
         context['has_requested'] = has_requested
         context['is_favorite'] = is_favorite
 
-        comments_query = advertisement.comments.all().order_by('-created_at')
+        comments_query = advertisement.comments.filter(parent__isnull=True).order_by('-created_at')
         context['comments'] = comments_query[:self.comments_paginate_by]
         context['has_more_comments'] = comments_query.count() > self.comments_paginate_by
         context['comments_paginate_by'] = self.comments_paginate_by
@@ -328,19 +328,32 @@ class AddCommentView(View):
         comments_paginate_by = 6
 
         text = request.POST.get('text', '').strip()
+        parent_id = (
+            request.POST.get('parentId') or
+            request.POST.get('parent_id')
+        )
+
         if not text:
             return JsonResponse({'error': 'Текст комментария не может быть пустым'}, status=400)
-        
-        comment = Comment.objects.create(
-            advertisement=advertisement,
-            author=request.user,
-            text=text
-        )
+
+        comment_data = {
+            'advertisement': advertisement,
+            'author': request.user,
+            'text': text
+        }
+
+        if parent_id:
+            comment_data['parent'] = Comment.objects.get(id=parent_id)
+
+        comment = Comment.objects.create(**comment_data)
 
         comment_html = render_to_string(
             'board/includes/comment_container_include.html',
-            {'comment': comment},
-            request
+            {
+                'comment': comment,
+                'advertisement': advertisement,
+            },
+                request
         )
 
         return JsonResponse({
@@ -370,12 +383,12 @@ class LoadMoreCommentsView(View):
         comments_paginate_by = AdDetailView.comments_paginate_by 
         
         advertisement = get_object_or_404(Advertisement, pk=pk)
-        comments_query = advertisement.comments.all().order_by('-created_at')
+        comments_query = advertisement.comments.filter(parent__isnull=True).order_by('-created_at')
         
         comments = comments_query[offset:offset + comments_paginate_by]
 
         comments_html = ''.join([
-            render_to_string('board/includes/comment_container_include.html', {'comment': comment}, request)
+            render_to_string('board/includes/comment_container_include.html', {'comment': comment, 'advertisement': advertisement}, request)
             for comment in comments
         ])
 

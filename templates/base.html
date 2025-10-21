@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock title %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/theme/themes.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/minty/bootstrap.min.css" integrity="sha384-H4X+4tKc7b8s4GoMrylmy2ssQYpDHoqzPa9aKXbDwPoPUA3Ra8PA5dGzijN+ePnH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     <script type="module" src="{% static 'js/main.js' %}" defer></script>
 </head>
-<body>
+<body class="{{ request.session.theme|default:'light' }}">
     <nav class="navbar navbar-expand-lg" style="background-color: #b3b3ffff;" data-bs-theme="dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'main_page' %}"><img src="{% static 'images/logo/lotos.png' %}" alt="Логотип" height="60" style="transform: translateY(-4px);"></a>
@@ -44,6 +45,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'profile' request.user.username %}"> <i class="bi bi-person-circle me-1 mx-2"></i>{{ request.user }}</a>
                     </li>
+
+                    <!-- Смена темы-->
+                    <form method="post" action="{% url 'change_theme' %}" class="ms-3 d-flex align-items-center">
+                        {% csrf_token %}
+                        <select name="theme" class="form-select form-select-sm rounded-circle border-primary text-center p-1" style="width: 55px; height: 40px;" onchange="this.form.submit()">
+                            <option value="light" {% if request.session.theme == 'light' %}selected{% endif %}>🌞</option>
+                            <option value="dark" {% if request.session.theme == 'dark' %}selected{% endif %}>🌙</option>
+                            <option value="pink" {% if request.session.theme == 'pink' %}selected{% endif %}>🌸</option>
+                        </select>
+                    </form>
+
                     <li class="nav-item"> 
                         <form action="{% url 'logout' %}" method="post" class="h-100 d-flex align-items-center">
                             {% csrf_token %}

@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "users/profile_base.html" %}
 
 {% block title %}Ваш профиль{% endblock title %}
 
-{% block content %}
+{% block profile_content %}
 
     {% if user == request.user %}
         <h2 class='my-5'>Ваш профиль</h2>
@@ -26,7 +26,8 @@
                 {% if req.status == 'new' and user == request.user %}
                     <form method='POST' action='{% url "request_update_status" req.id %}' style='display:inline;'>
                         {% csrf_token %}
-                    <br><button name='status' value='accepted' type='submit' class="btn btn-custom my-3">Принять</button>
+                        <br>
+                        <button name='status' value='accepted' type='submit' class="btn btn-custom my-3">Принять</button>
                         <button name='status' value='rejected' type='submit' class="btn btn-delete">Отклонить</button>
                     </form>
                 {% endif %}
@@ -43,7 +44,6 @@
         </div>
     {% endif %}
 
-
     {% if ads %}
         <h2>Ваши объявления</h2>
         {% for advertisement in ads %}
@@ -53,4 +53,4 @@
         <p class='my-4'>Объявлений нет. Создайте ваше первое объявление!</p>
     {% endif %}
 
-{% endblock content %}
+{% endblock profile_content %}

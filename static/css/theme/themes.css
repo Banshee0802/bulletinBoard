@@ -1,0 +1,32 @@
+
+.navbar {
+  background-color: var(--navbar-bg) !important;
+  color: var(--navbar-text) !important;
+}
+
+body, .container, .card-body, .a-title, h1, h2, h3, h5 {
+  color: var(--text-color) !important;
+  background-color: var(--bg-color) !important;
+}
+
+/* темы */
+body.light {
+  --bg-color: #ffffff;
+  --text-color: #222;
+  --navbar-bg: #b3b3ff;
+  --navbar-text: #222;
+}
+
+body.dark {
+  --bg-color: #333;
+  --text-color: #eee;
+  --navbar-bg:  #121212;
+  --navbar-text: #eee;
+}
+
+body.pink {
+  --bg-color: #ffd6e0;
+  --text-color: #333;
+  --navbar-bg: #ff8fab;
+  --navbar-text: #333;
+}

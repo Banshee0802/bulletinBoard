@@ -93,3 +93,10 @@ class RequestUpdateStatusView(LoginRequiredMixin, View):
             req.save()
 
         return redirect('profile', user_name=self.request.user.username)
+    
+
+@require_POST
+def change_theme(request):
+    theme = request.POST.get('theme', 'light')
+    request.session['theme'] = theme
+    return redirect(request.META.get('HTTP_REFERER', '/'))

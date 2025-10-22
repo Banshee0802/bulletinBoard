@@ -5,28 +5,40 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
+    <div class="row">
         <!-- аватар и базовая информация -->
-        <div class="col-md-4 text-center">
-            <div class="card p-3 shadow-sm">
+        <div class="col-lg-3 col-md-4 text-center mb-4">
+            <div class="card p-3 shadow-sm sticky-top" style="top: 20px;">
                 {% if user.profile.image %}
-    <img src="{{ user.profile.image.url }}" class="rounded-circle" 
-         alt="Аватар пользователя" style="width:150px; height:150px; object-fit:cover;">
-{% else %}
-    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3" 
-         style="width:150px; height:150px;">
-        <i class="bi bi-person-circle" style="font-size: 4rem; color: #aaa;"></i>
-    </div>
-{% endif %}
+                    <img src="{{ user.profile.image.url }}" class="rounded-circle" 
+                         alt="Аватар пользователя" style="width:150px; height:150px; object-fit:cover;">
+                {% else %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mb-3" 
+                         style="width:150px; height:150px;">
+                        <i class="bi bi-person-circle" style="font-size: 4rem; color: #aaa;"></i>
+                    </div>
+                {% endif %}
                 <h4>{{ user.username }}</h4>
                 <p class="text-muted">{{ user.email }}</p>
-                {% block profile_actions %}{% endblock profile_actions %}
+                {% block profile_actions %}
+                    {% if user == request.user %}
+                        <div class="my-3">
+                            <a href="{% url 'favorite_list' %}" class="btn btn-custom btn-sm w-100 mb-2">💖 Избранные объявления</a>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{% url 'password_change' %}" class="btn btn-delete btn-sm w-100">Сменить пароль</a>
+                        </div>
+                    {% endif %}
+                {% endblock profile_actions %}
             </div>
         </div>
 
-        <div class="col-md-8">
-            {% block profile_content %}
-            {% endblock profile_content %}
+        <!-- Основной контент - теперь шире -->
+        <div class="col-lg-9 col-md-8">
+            <div class="profile-content-wrapper">
+                {% block profile_content %}
+                {% endblock profile_content %}
+            </div>
         </div>
     </div>
 </div>

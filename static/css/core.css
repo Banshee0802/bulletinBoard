@@ -84,12 +84,14 @@
     color: white;
     box-shadow: 0 0 20px #eee;
     border-radius: 10px;
-    background-image: linear-gradient(to right, #FFD1DC 0%, #c5c5fd 51%, #FFD1DC 100%);
+    background-image: linear-gradient(to right, #ff8903 0%, #f7c9ae 51%, #ff8903 100%);
 }
 
 .btn-delete:hover {
     background-position: right center; 
 }
+
+
 
 
 .navbar-nav .nav-link {

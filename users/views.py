@@ -1,6 +1,6 @@
 from django.views import View
 from django.views.generic import CreateView, TemplateView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
@@ -10,6 +10,7 @@ from django.contrib.auth import login, get_user_model, authenticate
 from .forms import RegisterForm, LoginForm
 from board_app.models import Advertisement, Request
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 User = get_user_model()
@@ -100,3 +101,12 @@ def change_theme(request):
     theme = request.POST.get('theme', 'light')
     request.session['theme'] = theme
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class CustomPasswordChangeView(SuccessMessageMixin, LoginRequiredMixin, PasswordChangeView):
+    template_name = 'users/password_change.html'
+    success_url = reverse_lazy('password_change_done')
+    success_message = "Пароль успешно изменен!"
+
+class CustomPasswordChangeDoneView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/password_change_done.html'

@@ -5,52 +5,81 @@
 {% block profile_content %}
 
     {% if user == request.user %}
-        <h2 class='my-5'>Ваш профиль</h2>
+        <h2 class='mb-4'>Ваш профиль</h2>
     {% else %}
-        <h2>Профиль {{ user.username }}</h2>
+        <h2 class='mb-4'>Профиль {{ user.username }}</h2>
     {% endif %}
 
     {% if user == request.user %}
-        <h4 class='my-4 d-inline'>Отклики на ваши объявления:</h4>
+        <h4 class='my-4'>Отклики на ваши объявления:</h4>
     {% else %}
-        <h5 class='my-4'>Отклики на объявления пользователя {{ user.username }}</h5>
+        <h4 class='my-4'>Отклики на объявления пользователя {{ user.username }}</h4>
     {% endif %}
 
     {% if requests %}
-        <ul>
-        {% for req in requests %}
-            <li>
-                Заявка от {{ req.sender.username }} на объявление
-                <a href='{% url "ad_detail" req.advertisement.id %}'>{{ req.advertisement.title }}</a> - 
-                Статус: {{ req.get_status_display }}
-                {% if req.status == 'new' and user == request.user %}
-                    <form method='POST' action='{% url "request_update_status" req.id %}' style='display:inline;'>
-                        {% csrf_token %}
-                        <br>
-                        <button name='status' value='accepted' type='submit' class="btn btn-custom my-3">Принять</button>
-                        <button name='status' value='rejected' type='submit' class="btn btn-delete">Отклонить</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
+        <div class="requests-list mb-5">
+            {% for req in requests %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title">
+                                    Заявка от <strong>{{ req.sender.username }}</strong> на объявление
+                                    <a href='{% url "ad_detail" req.advertisement.id %}' style='color: #9494f3ff;'>"{{ req.advertisement.title }}"</a>
+                                </h6>
+                                <p class="card-text mb-1">
+                                    Статус: 
+                                    <span class="badge 
+                                        {% if req.status == 'accepted' %}bg-success
+                                        {% elif req.status == 'rejected' %}bg-danger
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ req.get_status_display }}
+                                    </span>
+                                </p>
+                                <small class="text-muted">Создано: {{ req.created_at|date:"d.m.Y H:i" }}</small>
+                            </div>
+                            {% if req.status == 'new' and user == request.user %}
+                                <div class="ms-3">
+                                    <form method='POST' action='{% url "request_update_status" req.id %}' class="d-inline">
+                                        {% csrf_token %}
+                                        <button name='status' value='accepted' type='submit' class="btn btn-success btn-sm">Принять</button>
+                                        <button name='status' value='rejected' type='submit' class="btn btn-danger btn-sm mt-1">Отклонить</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <span class='mx-3'>откликов пока нет</span>
-    {% endif %}
-
-    {% if user == request.user %}
-        <div class="my-4">
-            <a href="{% url 'favorite_list' %}" class="btn btn-custom">💖 Ваши избранные объявления</a>
+        <div class="alert alert-info mb-5">
+            <p class="mb-0">Откликов пока нет</p>
         </div>
     {% endif %}
 
     {% if ads %}
-        <h2>Ваши объявления</h2>
-        {% for advertisement in ads %}
-        {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
-        {% endfor %}
+        <h3 class="mb-4">
+            {% if user == request.user %}Ваши объявления{% else %}Объявления пользователя{% endif %}
+            <span class="badge bg-primary ms-2">{{ ads.count }}</span>
+        </h3>
+        
+        <div class="ads-container">
+            {% for advertisement in ads %}
+                <div class="mb-4">
+                    {% include 'board/includes/ads_container_include.html' with advertisement=advertisement %}
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p class='my-4'>Объявлений нет. Создайте ваше первое объявление!</p>
+        <div class="alert alert-warning">
+            <h5>Объявлений пока нет</h5>
+            {% if user == request.user %}
+                <p class="mb-0">Создайте ваше первое объявление!</p>
+            {% else %}
+                <p class="mb-0">Пользователь пока не создал объявлений</p>
+            {% endif %}
+        </div>
     {% endif %}
 
 {% endblock profile_content %}

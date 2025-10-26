@@ -4,33 +4,65 @@
 {% block title %}Вход в аккаунт{% endblock title %}
 
 {% block content %}
-<h2>Вход</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    
-    {% if request.GET.next and not 'login' in request.GET.next %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-    {% else %}
-        <input type="hidden" name="next" value="{% url 'ad_list' %}">
-    {% endif %}
-    
-    <div class="mb-3">
-        {{ form.username.label_tag }}<br>
-        {{ form.username|add_class:"form-control" }}
-        {% for error in form.username.errors %}
-            <div class="text-danger">{{ error }}</div>
-        {% endfor %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header text-white" style='background-color: #6161f7ff'>
+                <h4 class="card-title mb-0 text-center">
+                    <i class="bi bi-box-arrow-in-right me-2 mx-2"></i>Вход в аккаунт
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    
+                    {% if request.GET.next and not 'login' in request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% else %}
+                        <input type="hidden" name="next" value="{% url 'ad_list' %}">
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        {{ form.username.label_tag }}
+                        {{ form.username|add_class:"form-control" }}
+                        {% for error in form.username.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+     
+                    <div class="mb-3">
+                        {{ form.password.label_tag }}
+                        {{ form.password|add_class:"form-control" }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg" style='background-color: #6161f7ff'>
+                            <i class="bi bi-box-arrow-in-right me-2 mx-2"></i>Войти
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center">
+                    <!-- Кнопка "Забыли пароль?" -->
+                    <div class="mb-3">
+                        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-question-circle me-1 mx-2"></i>Забыли пароль?
+                        </a>
+                    </div>
+                    
+                    <!-- Ссылка на регистрацию -->
+                    <div>
+                        <a href="{% url 'register' %}" class="text-decoration-none" style='color: #6161f7ff'>
+                            <i class="bi bi-person-plus me-1 mx-2"></i>Нет аккаунта? Регистрация
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
- 
-    <div class="mb-3">
-        {{ form.password.label_tag }}<br>
-        {{ form.password|add_class:"form-control" }}
-        {% for error in form.password.errors %}
-            <div class="text-danger">{{ error }}</div>
-        {% endfor %}
-    </div>
-    <button type="submit" class="btn btn-custom">Войти</button>
-</form>
-<a href="{% url 'register' %}">Нет аккаунта? Регистрация</a>
+</div>
 {% endblock %}

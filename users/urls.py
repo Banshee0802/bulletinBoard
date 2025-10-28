@@ -4,12 +4,16 @@ from django.urls import reverse_lazy
 from .views import ( 
     RegisterView, CustomLoginView, CustomLogoutView, 
     ProfileView, RequestUpdateStatusView, change_theme, 
-    CustomPasswordChangeView, CustomPasswordChangeDoneView
+    CustomPasswordChangeView, CustomPasswordChangeDoneView,
+    ActivateAccountView,
 )
 
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
+
+    path('activate-account/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate_account'),
+
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('profile/<str:user_name>/', ProfileView.as_view(), name='profile'),

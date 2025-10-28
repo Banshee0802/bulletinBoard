@@ -1,5 +1,5 @@
 from django.views import View
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, View
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
@@ -11,7 +11,13 @@ from .forms import RegisterForm, LoginForm
 from board_app.models import Advertisement, Request
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from config.settings import LOGIN_REDIRECT_URL, DEFAULT_FROM_EMAIL
 
 User = get_user_model()
 
@@ -19,23 +25,67 @@ User = get_user_model()
 class RegisterView(CreateView):
     form_class = RegisterForm
     template_name = 'users/register.html'
-    success_url = reverse_lazy('ad_list')
     
     def form_valid(self, form):
-        response = super().form_valid(form)
-        user = form.save()
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+
+        self.send_activation_email(user)
+
+        messages.success(
+            self.request, 
+            'Регистрация прошла успешно! Проверьте почту для активации аккаунта'
+            )
+
+        return redirect('login')
+    
+    def send_activation_email(self, user):
+        token = default_token_generator.make_token(user)
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        activation_url = self.request.build_absolute_uri(reverse_lazy('activate_account', kwargs={'uidb64': uidb64, 'token': token}))
+
+        site_name = get_current_site(self.request).name
         
-        user = authenticate(
-            username=form.cleaned_data['username'],
-            password=form.cleaned_data['password1']
+        subject = render_to_string('users/emails/subjects/activate_account.txt', {
+            'site_name': site_name,
+        })
+        message = render_to_string('users/emails/activate_account.txt', {
+            'site_name': site_name,
+            'activation_url': activation_url
+        })
+        html_message = render_to_string('users/emails/activate_account.html', {
+            'site_name': site_name,
+            'activation_url': activation_url
+        })
+        
+
+        send_mail(
+            subject=subject,
+            message=message,
+            html_message=html_message,
+            from_email=DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email]
         )
-        
-        if user is not None:
-            login(self.request, user)
-            messages.success(self.request, 'Регистрация прошла успешно!')
-        
-        return response
-        
+
+
+class ActivateAccountView(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Аккаунт успешно активирован! Войдите в аккаунт')
+            return redirect('login')
+        else:
+            messages.error(request, 'Ссылка активации недействительна или устарела')
+            return redirect('register')
+
     
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'

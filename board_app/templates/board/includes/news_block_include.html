@@ -1,0 +1,53 @@
+<div class="news mb-4">
+    <div class="card">
+        <div class="card-header text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-megaphone me-2"></i>
+                {% if news_ads|length > 1 %}Новости и обновления{% else %}Новость{% endif %}
+            </h5>
+        </div>
+        <div class="card-body">
+            {% for news_ad in news_ads %}
+            <div class="news-item mb-3 {% if not forloop.last %}pb-3 border-bottom{% endif %}">
+                <div class="d-flex align-items-start">
+                    {% if news_ad.image %}
+                    <img src="{{ news_ad.image.url }}" alt="{{ news_ad.title }}" 
+                         class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            {% if news_ad.new_item.is_important %}
+                            <span class="badge bg-danger me-1 mx-2">Важно</span>
+                            {% endif %}
+                            {% if news_ad.new_item.pinned %}
+                            <span class="badge bg-warning me-1">Закреплено</span>
+                            {% endif %}
+                            <span class="badge bg-info">{{ news_ad.new_item.get_news_type_display }}</span>
+                            {{ news_ad.title }}
+                        </h6>
+                        <p class="text-muted small mb-1 mx-2">{{ news_ad.description|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted mx-2">{{ news_ad.created_at|date:"d.m.Y H:i" }}</small>
+                            <a href="{% url 'ad_detail' news_ad.pk %}" class="btn btn-sm btn-outline-primary">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if user.is_authenticated %}
+<div class="card-footer bg-light">
+    <form method="post" action="{% url 'toggle_important_news_subscription' %}" class="d-flex justify-content-between align-items-center">
+        {% csrf_token %}
+        <small>Получать уведомления о важных новостях</small>
+        <button type="submit" class="btn btn-sm {% if is_subscribed %}btn-danger{% else %}btn-success{% endif %}">
+            {% if is_subscribed %}Отписаться{% else %}Подписаться{% endif %}
+        </button>
+    </form>
+</div>
+{% endif %}
+    </div>
+</div>

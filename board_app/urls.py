@@ -22,4 +22,5 @@ urlpatterns = [
     path('ads/<int:pk>/comments/add/', views.AddCommentView.as_view(), name='add_comment'),
     path('ads/<int:pk>/comments/load-more/', views.LoadMoreCommentsView.as_view(), name='load_more_comments'),
     path('comments/<int:pk>/delete/', views.DeleteCommentView.as_view(), name='delete_comment'),
+    path('news/important/toggle-subscription/', views.ToggleImportantNewsSubscriptionView.as_view(), name='toggle_important_news_subscription'),
 ]

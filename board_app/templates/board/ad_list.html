@@ -33,6 +33,10 @@
         <div class="col-md-9 col-lg-10">
             <div class="p-3">  
                 <h1 style="color: #000000ff">Объявления</h1>
+
+                 {% if news_ads %}
+                    {% include 'board/includes/news_block_include.html' %}
+                {% endif %}
                 
                 {% if ads %}
                     <div 

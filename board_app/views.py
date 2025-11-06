@@ -53,6 +53,16 @@ class AdListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        news_ads = Advertisement.objects.filter(
+            new_item__isnull=False,
+        ).order_by('-created_at')
+
+        context['news_ads'] = news_ads
+
+        if self.request.user.is_authenticated:
+           context['is_subscribed'] = self.request.session.get('subscribed_to_important_news', True)
+
         context['is_search'] = False
         context['search_query'] = ''
         context['has_more'] = self.get_queryset().count() > self.paginate_by
@@ -398,3 +408,19 @@ class LoadMoreCommentsView(View):
             'html': comments_html,
             'has_more': has_more_comments
         })
+    
+
+class ToggleImportantNewsSubscriptionView(View):
+    def post(self, request):
+        if request.user.is_authenticated:
+            current_status = request.session.get('subscribed_to_important_news', True)
+            request.session['subscribed_to_important_news'] = not current_status
+            
+            if not current_status:
+                messages.success(request, 'Вы подписались на новости!')
+            else:
+                messages.warning(request, 'Вы отписались от новостей')
+        else:
+            messages.error(request, 'Для управления подпиской необходимо авторизоваться')
+
+        return redirect('ad_list')

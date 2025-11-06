@@ -123,3 +123,31 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         db_table = 'ads_comments'
+
+
+class News(models.Model):
+    advertisement = models.OneToOneField(
+        Advertisement,
+        on_delete=models.CASCADE,
+        related_name='new_item',
+        verbose_name='Новости'
+    )
+    is_important = models.BooleanField(verbose_name='Важные новости')
+    news_type = models.CharField(
+        choices=[
+            ('announcement', 'Реклама'),
+            ('update', 'Новинка'),
+            ('event', 'Событие'),
+            ('maintenence', 'Технические работы'),
+        ],
+        verbose_name='Тип новости'
+    )
+    pinned = models.BooleanField(verbose_name='Закрепленная новость')
+
+    class Meta:
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+        db_table = 'ads_news'
+
+    def __str__(self):
+        return f"{self.advertisement.title}"

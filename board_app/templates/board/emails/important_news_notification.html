@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        .header { 
+            background: #8484f8; 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 10px 10px 0 0;
+        }
+        .content { 
+            padding: 25px; 
+            background: #f9f9f9; 
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        .footer { 
+            text-align: center; 
+            padding: 20px; 
+            color: #666; 
+            font-size: 14px;
+            background: #f0f0f0;
+            border-radius: 0 0 10px 10px;
+        }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 24px; 
+            background: #8484f8; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 15px 0;
+        }
+        .news-meta {
+            background: #e6e6fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Важная новость</h1>
+            <p>На сайте Лотос</p>
+        </div>
+        
+        <div class="content">
+            <h2>{{ news.advertisement.title }}</h2>
+            
+            <div class="news-meta">
+                <p><strong>Тип новости:</strong> {{ news.get_news_type_display }}</p>
+                {% if news.pinned %}<span class="badge">📌 Закреплено</span>{% endif %}
+                {% if news.is_important %}<span class="badge">⚠️ Важно</span>{% endif %}
+            </div>
+            
+            <p><strong>Описание:</strong></p>
+            <p>{{ news.advertisement.description|truncatewords:50 }}</p>
+            
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="{{ site_url }}/ad/{{ news.advertisement.pk }}/" class="btn">
+                    📖 Читать полную новость
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>С уважением,<br>Команда Лотос</strong></p>
+            <p style="font-size: 12px; color: #888;">
+                Вы получили это письмо, потому что подписаны на важные новости.<br>
+                <a href="{{ site_url }}/ads/" style="color: #8484f8;">Отписаться от рассылки</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
